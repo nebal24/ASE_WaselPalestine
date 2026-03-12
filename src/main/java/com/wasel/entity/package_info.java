@@ -1,4 +1,4 @@
-package com.wasel.wasel.entity;
+package com.wasel.entity;
 
 public class package_info {
 }

@@ -1,4 +1,4 @@
-package com.wasel.wasel;
+package com.wasel;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

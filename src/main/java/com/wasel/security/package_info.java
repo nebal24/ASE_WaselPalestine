@@ -1,4 +1,4 @@
-package com.wasel.wasel.security;
+package com.wasel.security;
 public class package_info {
 }
 

@@ -1,4 +1,4 @@
-package com.wasel.wasel.service;
+package com.wasel.service;
 public class package_info {
 }
 

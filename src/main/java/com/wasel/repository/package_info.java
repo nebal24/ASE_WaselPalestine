@@ -1,4 +1,4 @@
-package com.wasel.wasel.repository;
+package com.wasel.repository;
 public class package_info {
 }
 

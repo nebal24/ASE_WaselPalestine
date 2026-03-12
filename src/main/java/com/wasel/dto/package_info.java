@@ -1,4 +1,4 @@
-package com.wasel.wasel.dto;
+package com.wasel.dto;
 public class package_info {
 }
 

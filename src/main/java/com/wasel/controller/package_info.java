@@ -1,4 +1,4 @@
-package com.wasel.wasel.controller;
+package com.wasel.controller;
 public class package_info {
 }
 

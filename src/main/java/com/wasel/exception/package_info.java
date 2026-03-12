@@ -1,4 +1,4 @@
-package com.wasel.wasel.exception;
+package com.wasel.exception;
 public class package_info {
 }
 
