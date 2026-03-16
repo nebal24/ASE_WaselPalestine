@@ -5,7 +5,7 @@ import com.wasel.dto.UserSummaryDTO;
 import com.wasel.dto.CheckpointSummaryDTO;
 import com.wasel.entity.Incident;
 import com.wasel.entity.User;
-import com.wasel.entity.Checkpoint;
+import com.wasel.entity.CheckPoint;
 import org.springframework.stereotype.Component;
 
 @Component
