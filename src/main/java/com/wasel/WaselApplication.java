@@ -1,6 +1,6 @@
 package com.wasel;
 
-import com.wasel.entity.CheckPoint;
+import com.wasel.entity.Checkpoint;
 import com.wasel.entity.Incident;
 import com.wasel.entity.User;
 import com.wasel.model.*;
@@ -10,6 +10,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.annotation.Transactional;  // أضف هذا
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class WaselApplication {
     }
 
     @Bean
+    @Transactional  // أضف هذا
     CommandLineRunner run(CheckpointService checkpointService, UserRepository userRepository) {
         return args -> {
 
@@ -37,7 +39,7 @@ public class WaselApplication {
                 admin = new User();
                 admin.setName("Admin User");
                 admin.setEmail("admin@wasel.ps");
-                admin.setPassword("password123");           // سيتم تشفيره لاحقاً
+                admin.setPassword("password123");
                 admin.setRole(Role.ADMIN);
                 admin.setCreatedAt(LocalDateTime.now());
                 admin = userRepository.save(admin);
@@ -48,11 +50,11 @@ public class WaselApplication {
             // النقطة 1: Centralized registry of checkpoints
             // =============================================
             // إنشاء 3 حواجز
-            CheckPoint huwara = createCheckpoint(checkpointService, admin, "Huwara Checkpoint", 32.2, 35.3);
-            CheckPoint qalandia = createCheckpoint(checkpointService, admin, "Qalandia Checkpoint", 31.8, 35.2);
-            CheckPoint beitEl = createCheckpoint(checkpointService, admin, "Beit El Checkpoint", 31.9, 35.2);
+            Checkpoint huwara = createCheckpoint(checkpointService, admin, "Huwara Checkpoint", 32.2, 35.3);
+            Checkpoint qalandia = createCheckpoint(checkpointService, admin, "Qalandia Checkpoint", 31.8, 35.2);
+            Checkpoint beitEl = createCheckpoint(checkpointService, admin, "Beit El Checkpoint", 31.9, 35.2);
 
-            // ربط حادث (Incident) مع حاجز (مثال على road closure / accident)
+            // ربط حادث (Incident) مع حاجز
             Incident accident = new Incident();
             accident.setDescription("حادث سير كبير عند البوابة الرئيسية");
             accident.setCategory(IncidentCategory.ACCIDENT);
@@ -73,22 +75,23 @@ public class WaselApplication {
             System.out.println("   • Incident مرتبط مع حاجز");
             System.out.println("   • تاريخ الحالات (Status History) تم تسجيله");
 
-            // عرض التاريخ للتأكيد
+            // عرض التاريخ للتأكيد - عدل هذا الجزء
+            System.out.println("\n📊 تاريخ حالات Huwara:");
             checkpointService.getStatusHistory(huwara.getId()).forEach(history -> {
-                System.out.println("   → تاريخ Huwara: " + history.getStatus() +
+                System.out.println("   → " + history.getStatus() +
                         " | " + history.getUpdatedAt() +
-                        " | By User: " + history.getUpdatedBy().getName());
+                        " | بواسطة: " + history.getUpdatedBy().getName());
             });
         };
     }
 
     // Helper method لإنشاء Checkpoint
-    private CheckPoint createCheckpoint(CheckpointService service, User user, String name, double lat, double lng) {
-        CheckPoint cp = new CheckPoint();
+    private Checkpoint createCheckpoint(CheckpointService service, User user, String name, double lat, double lng) {
+        Checkpoint cp = new Checkpoint();
         cp.setName(name);
         cp.setLatitude(lat);
         cp.setLongitude(lng);
-        CheckPoint saved = service.createCheckpoint(cp, user.getId());
+        Checkpoint saved = service.createCheckpoint(cp, user.getId());
         System.out.println("✅ Checkpoint تم إنشاؤه: " + name);
         return saved;
     }

@@ -3,9 +3,10 @@ package com.wasel.mapper;
 import com.wasel.dto.IncidentDTO;
 import com.wasel.dto.UserSummaryDTO;
 import com.wasel.dto.CheckpointSummaryDTO;
+import com.wasel.dto.IncidentRequestDTO;
 import com.wasel.entity.Incident;
 import com.wasel.entity.User;
-import com.wasel.entity.CheckPoint;
+import com.wasel.entity.Checkpoint;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -50,7 +51,7 @@ public class IncidentMapper {
             checkpoint.setName(incident.getCheckpoint().getName());
             checkpoint.setLatitude(incident.getCheckpoint().getLatitude());
             checkpoint.setLongitude(incident.getCheckpoint().getLongitude());
-            checkpoint.setCurrentStatus(incident.getCheckpoint().getCurrentStatus());
+            checkpoint.setCurrentStatus(incident.getCheckpoint().getCurrentStatus().toString());  // حول enum لـ String
             dto.setCheckpoint(checkpoint);
         }
 

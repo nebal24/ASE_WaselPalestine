@@ -4,14 +4,13 @@ import com.wasel.model.CheckpointStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "checkpoint")
+@Table(name = "checkpoints")
 @Data
-public class CheckPoint {
+public class Checkpoint  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

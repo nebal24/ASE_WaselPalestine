@@ -60,7 +60,7 @@ public class Incident {
 
     @ManyToOne
     @JoinColumn(name = "checkpoint_id")
-    private CheckPoint checkpoint;
+    private Checkpoint  checkpoint;
 
     @PrePersist
     protected void onCreate() {

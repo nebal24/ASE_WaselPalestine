@@ -17,7 +17,7 @@ public class CheckpointStatusHistory {
 
     @ManyToOne
     @JoinColumn(name = "checkpoint_id", nullable = false)
-    private CheckPoint checkpoint;
+    private Checkpoint  checkpoint;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -5,7 +5,7 @@ import com.wasel.dto.IncidentFilterDTO;
 import com.wasel.dto.IncidentRequestDTO;
 import com.wasel.entity.Incident;
 import com.wasel.entity.User;
-import com.wasel.entity.CheckPoint;
+import com.wasel.entity.Checkpoint;
 import com.wasel.model.IncidentStatus;
 import com.wasel.repository.IncidentRepository;
 import com.wasel.repository.UserRepository;
@@ -66,7 +66,7 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setCreatedBy(user);
 
         if (incidentDTO.getCheckpointId() != null) {
-            CheckPoint checkpoint = checkpointRepository.findById(incidentDTO.getCheckpointId())
+            Checkpoint checkpoint = checkpointRepository.findById(incidentDTO.getCheckpointId())
                     .orElseThrow(() -> new ResourceNotFoundException("Checkpoint not found"));
             incident.setCheckpoint(checkpoint);
         }
@@ -96,7 +96,7 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setLongitude(incidentDTO.getLongitude());
 
         if (incidentDTO.getCheckpointId() != null) {
-            CheckPoint checkpoint = checkpointRepository.findById(incidentDTO.getCheckpointId())
+            Checkpoint checkpoint = checkpointRepository.findById(incidentDTO.getCheckpointId())
                     .orElseThrow(() -> new ResourceNotFoundException("Checkpoint not found"));
             incident.setCheckpoint(checkpoint);
         }

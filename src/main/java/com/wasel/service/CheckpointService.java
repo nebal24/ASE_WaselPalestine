@@ -1,11 +1,14 @@
 package com.wasel.service;
 
-import com.wasel.entity.CheckPoint;
+import com.wasel.entity.Checkpoint;
 import com.wasel.entity.CheckpointStatusHistory;
+import com.wasel.entity.Incident;
 import com.wasel.entity.User;
 import com.wasel.model.CheckpointStatus;
+import com.wasel.model.IncidentStatus;
 import com.wasel.repository.CheckpointRepository;
 import com.wasel.repository.CheckpointStatusHistoryRepository;
+import com.wasel.repository.IncidentRepository;
 import com.wasel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,37 +24,36 @@ public class CheckpointService {
     private final CheckpointRepository checkpointRepository;
     private final CheckpointStatusHistoryRepository historyRepository;
     private final UserRepository userRepository;
+    private final IncidentRepository incidentRepository;
 
-    // النقطة 1: إنشاء Checkpoint + أول سجل في التاريخ
     @Transactional
-    public CheckPoint createCheckpoint(CheckPoint checkpoint, Long createdByUserId) {
+    public Checkpoint createCheckpoint(Checkpoint checkpoint, Long createdByUserId) {
         User user = userRepository.findById(createdByUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         checkpoint.setCurrentStatus(CheckpointStatus.OPEN);
-        CheckPoint saved = checkpointRepository.save(checkpoint);
+        Checkpoint saved = checkpointRepository.save(checkpoint);
 
         saveStatusHistory(saved, CheckpointStatus.OPEN, user);
         return saved;
     }
 
-    // النقطة 2: تحديث الحالة + حفظ في التاريخ
     @Transactional
-    public CheckPoint updateStatus(Long checkpointId, CheckpointStatus newStatus, Long updatedByUserId) {
-        CheckPoint cp = checkpointRepository.findById(checkpointId)
+    public Checkpoint updateStatus(Long checkpointId, CheckpointStatus newStatus, Long updatedByUserId) {
+        Checkpoint cp = checkpointRepository.findById(checkpointId)
                 .orElseThrow(() -> new RuntimeException("Checkpoint not found"));
 
         User user = userRepository.findById(updatedByUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         cp.setCurrentStatus(newStatus);
-        CheckPoint saved = checkpointRepository.save(cp);
+        Checkpoint saved = checkpointRepository.save(cp);
 
         saveStatusHistory(saved, newStatus, user);
         return saved;
     }
 
-    private void saveStatusHistory(CheckPoint checkpoint, CheckpointStatus status, User user) {
+    private void saveStatusHistory(Checkpoint checkpoint, CheckpointStatus status, User user) {
         CheckpointStatusHistory history = new CheckpointStatusHistory();
         history.setCheckpoint(checkpoint);
         history.setStatus(status);
@@ -60,16 +62,14 @@ public class CheckpointService {
         historyRepository.save(history);
     }
 
-    // جلب تاريخ الحالات (للاختبار فقط، للتأكيد على النقطة 2)
+    @Transactional(readOnly = true)
     public List<CheckpointStatusHistory> getStatusHistory(Long checkpointId) {
-        CheckPoint cp = checkpointRepository.findById(checkpointId)
-                .orElseThrow(() -> new RuntimeException("Checkpoint not found with id: " + checkpointId));
-        return cp.getStatusHistory();
+        return historyRepository.findByCheckpointId(checkpointId);
     }
-    // لإنشاء Incident مرتبط بحاجز (للنقطة 1: road closures, delays, hazardous conditions)
+
     @Transactional
     public Incident createIncidentForCheckpoint(Long checkpointId, Incident incident, Long createdByUserId) {
-        CheckPoint cp = checkpointRepository.findById(checkpointId)
+        Checkpoint cp = checkpointRepository.findById(checkpointId)
                 .orElseThrow(() -> new RuntimeException("Checkpoint not found"));
 
         User user = userRepository.findById(createdByUserId)
@@ -78,7 +78,7 @@ public class CheckpointService {
         incident.setCheckpoint(cp);
         incident.setCreatedBy(user);
         incident.setCreatedAt(LocalDateTime.now());
-        incident.setStatus(IncidentStatus.OPEN);  // افتراضي
+        incident.setStatus(IncidentStatus.OPEN);
 
         return incidentRepository.save(incident);
     }

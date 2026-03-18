@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Entity
 @Table(name = "users")
 @Data
@@ -41,7 +40,7 @@ public class User {
     @Column(name = "is_active")
     private Boolean isActive = true;
 
-    // علاقات (Relationships)
+    // علاقات (Relationships) - شغالة حالياً
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
     private List<Incident> createdIncidents;
 
@@ -51,6 +50,8 @@ public class User {
     @OneToMany(mappedBy = "updatedBy")
     private List<CheckpointStatusHistory> checkpointStatusHistories;
 
+    // 🔴 علق على هذه الأسطر مؤقتاً:
+    /*
     @OneToMany(mappedBy = "user")
     private List<Report> reports;
 
@@ -62,6 +63,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<AlertSubscription> alertSubscriptions;
+    */
 
     @PrePersist
     protected void onCreate() {
