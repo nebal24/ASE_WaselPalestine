@@ -136,12 +136,13 @@ public class IncidentServiceImpl implements IncidentService {
         Incident incident = incidentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Incident not found"));
 
-        // فقط الـ Admin يقدر يحذف
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (!user.getRole().toString().equals("ADMIN")) {
-            throw new UnauthorizedException("Only admins can delete incidents");
+        // ✅ التعديل: ADMIN أو MODERATOR يقدر يحذف
+        String role = user.getRole().toString();
+        if (!role.equals("ADMIN") && !role.equals("MODERATOR")) {
+            throw new UnauthorizedException("Only admins or moderators can delete incidents");
         }
 
         incidentRepository.delete(incident);

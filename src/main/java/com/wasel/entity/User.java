@@ -1,18 +1,26 @@
 package com.wasel.entity;
+
 import com.wasel.model.Role;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,43 +46,36 @@ public class User {
     private LocalDateTime updatedAt;
 
     @Column(name = "is_active")
+    @Builder.Default
     private Boolean isActive = true;
 
-    // علاقات (Relationships) - شغالة حالياً
-    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
-    private List<Incident> createdIncidents;
-
-    @OneToMany(mappedBy = "verifiedBy")
-    private List<Incident> verifiedIncidents;
-
-    @OneToMany(mappedBy = "updatedBy")
-    private List<CheckpointStatusHistory> checkpointStatusHistories;
-
-    // 🔴 علق على هذه الأسطر مؤقتاً:
-    /*
-    @OneToMany(mappedBy = "user")
-    private List<Report> reports;
-
-    @OneToMany(mappedBy = "user")
-    private List<Vote> votes;
-
-    @OneToMany(mappedBy = "moderator")
-    private List<ModerationAction> moderationActions;
-
-    @OneToMany(mappedBy = "user")
-    private List<AlertSubscription> alertSubscriptions;
-    */
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        if (isActive == null) {
-            isActive = true;
-        }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActive;
     }
 }
