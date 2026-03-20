@@ -52,7 +52,7 @@ public class WaselApplication {
             if (existingUser.isPresent()) {
                 // Admin already exists - use existing
                 admin = existingUser.get();
-                System.out.println("✅ Admin user already exists - ID: " + admin.getId());
+                System.out.println("Admin user already exists - ID: " + admin.getId());
             } else {
                 // Create new admin user with encrypted password
                 admin = new User();
@@ -62,7 +62,7 @@ public class WaselApplication {
                 admin.setRole(Role.ADMIN);
                 admin.setCreatedAt(LocalDateTime.now());
                 admin = userRepository.save(admin);
-                System.out.println("✅ New test admin created - ID: " + admin.getId());
+                System.out.println("New test admin created - ID: " + admin.getId());
             }
 
             // =============================================
@@ -83,7 +83,7 @@ public class WaselApplication {
             accident.setLongitude(35.3);
 
             checkpointService.createIncidentForCheckpoint(huwara.getId(), accident, admin.getId());
-            System.out.println("✅ Incident linked to Huwara Checkpoint created");
+            System.out.println("Incident linked to Huwara Checkpoint created");
 
             // =============================================
             // 4. Update checkpoint statuses for demonstration
@@ -91,7 +91,7 @@ public class WaselApplication {
             checkpointService.updateStatus(huwara.getId(), CheckpointStatus.DELAYED, admin.getId());
             checkpointService.updateStatus(qalandia.getId(), CheckpointStatus.CLOSED, admin.getId());
 
-            System.out.println("\n🎉 Features 1 and 2 (Checkpoint Management and Status History) completed!");
+            System.out.println("\n Features 1 and 2 (Checkpoint Management and Status History) completed!");
         };
     }
 
@@ -112,7 +112,7 @@ public class WaselApplication {
         cp.setLongitude(lng);
 
         Checkpoint saved = service.createCheckpoint(cp, user.getId());
-        System.out.println("✅ Checkpoint created: " + name);
+        System.out.println("Checkpoint created: " + name);
 
         return saved;
     }
