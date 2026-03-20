@@ -10,7 +10,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.transaction.annotation.Transactional;  // أضف هذا
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -23,12 +24,14 @@ public class WaselApplication {
     }
 
     @Bean
-    @Transactional  // أضف هذا
-    CommandLineRunner run(CheckpointService checkpointService, UserRepository userRepository) {
+    @Transactional
+    CommandLineRunner run(CheckpointService checkpointService,
+                          UserRepository userRepository,
+                          PasswordEncoder passwordEncoder) {  // 👈 أضيفي PasswordEncoder هنا
         return args -> {
 
             // =============================================
-            // 1. إنشاء يوزر اختباري (Admin) إذا لم يكن موجود
+            // 1. إنشاء يوزر اختباري (Admin) مع تشفير كلمة السر
             // =============================================
             Optional<User> existingUser = userRepository.findByEmail("admin@wasel.ps");
             User admin;
@@ -39,7 +42,7 @@ public class WaselApplication {
                 admin = new User();
                 admin.setName("Admin User");
                 admin.setEmail("admin@wasel.ps");
-                admin.setPassword("password123");
+                admin.setPassword(passwordEncoder.encode("password123"));  // 👈 شفري كلمة السر
                 admin.setRole(Role.ADMIN);
                 admin.setCreatedAt(LocalDateTime.now());
                 admin = userRepository.save(admin);
@@ -47,14 +50,12 @@ public class WaselApplication {
             }
 
             // =============================================
-            // النقطة 1: Centralized registry of checkpoints
+            // باقي الكود لإنشاء checkpoints والحوادث
             // =============================================
-            // إنشاء 3 حواجز
             Checkpoint huwara = createCheckpoint(checkpointService, admin, "Huwara Checkpoint", 32.2, 35.3);
             Checkpoint qalandia = createCheckpoint(checkpointService, admin, "Qalandia Checkpoint", 31.8, 35.2);
             Checkpoint beitEl = createCheckpoint(checkpointService, admin, "Beit El Checkpoint", 31.9, 35.2);
 
-            // ربط حادث (Incident) مع حاجز
             Incident accident = new Incident();
             accident.setDescription("حادث سير كبير عند البوابة الرئيسية");
             accident.setCategory(IncidentCategory.ACCIDENT);
@@ -64,28 +65,13 @@ public class WaselApplication {
             checkpointService.createIncidentForCheckpoint(huwara.getId(), accident, admin.getId());
             System.out.println("✅ Incident مرتبط بحاجز Huwara تم إنشاؤه");
 
-            // =============================================
-            // النقطة 2: Status History
-            // =============================================
             checkpointService.updateStatus(huwara.getId(), CheckpointStatus.DELAYED, admin.getId());
             checkpointService.updateStatus(qalandia.getId(), CheckpointStatus.CLOSED, admin.getId());
 
             System.out.println("\n🎉 النقطتين 1 و 2 تم تنفيذهما بالكامل!");
-            System.out.println("   • 3 حواجز تم إنشاؤها");
-            System.out.println("   • Incident مرتبط مع حاجز");
-            System.out.println("   • تاريخ الحالات (Status History) تم تسجيله");
-
-            // عرض التاريخ للتأكيد - عدل هذا الجزء
-            System.out.println("\n📊 تاريخ حالات Huwara:");
-            checkpointService.getStatusHistory(huwara.getId()).forEach(history -> {
-                System.out.println("   → " + history.getStatus() +
-                        " | " + history.getUpdatedAt() +
-                        " | بواسطة: " + history.getUpdatedBy().getName());
-            });
         };
     }
 
-    // Helper method لإنشاء Checkpoint
     private Checkpoint createCheckpoint(CheckpointService service, User user, String name, double lat, double lng) {
         Checkpoint cp = new Checkpoint();
         cp.setName(name);

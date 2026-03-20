@@ -31,11 +31,7 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
             "(:category IS NULL OR i.category = :category) AND " +
             "(:severity IS NULL OR i.severity = :severity) AND " +
             "(:status IS NULL OR i.status = :status) AND " +
-            "(:checkpointId IS NULL OR i.checkpoint.id = :checkpointId) AND " +
-            "(:latitude IS NULL OR :longitude IS NULL OR " +
-            "   (6371 * acos(cos(radians(:latitude)) * cos(radians(i.latitude)) * " +
-            "   cos(radians(i.longitude) - radians(:longitude)) + sin(radians(:latitude)) * " +
-            "   sin(radians(i.latitude)))) <= :radius)")
+            "(:checkpointId IS NULL OR i.checkpoint.id = :checkpointId)")
     Page<Incident> findWithFilters(
             @Param("category") IncidentCategory category,
             @Param("severity") IncidentSeverity severity,
