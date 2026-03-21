@@ -62,6 +62,7 @@ public class SecurityConfig {
                 // This ensures JWT is processed first
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
+
         return http.build();
     }
 }

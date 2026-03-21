@@ -7,7 +7,6 @@ public class ReportRequestDTO {
     private Double latitude;
     private Double longitude;
     private Long relatedCheckpointId;   // optional - ممكن يكون null
-    private Long userId; // temporary until JWT is connected
 
     public Long getRelatedCheckpointId() { return relatedCheckpointId; }
     public void setRelatedCheckpointId(Long id) { this.relatedCheckpointId = id; }
@@ -24,6 +23,4 @@ public class ReportRequestDTO {
     public Double getLongitude() { return longitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
 
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
 }

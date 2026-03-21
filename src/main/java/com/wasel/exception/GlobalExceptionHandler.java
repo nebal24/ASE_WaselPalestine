@@ -63,13 +63,4 @@ public class GlobalExceptionHandler {
                 .body(java.util.Map.of("error", ex.getMessage()));
 
     }
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ReportResponseDTO> handleResourceNotFoundException(ResourceNotFoundException ex)
-    {
-        return new ResponseEntity<>(
-                new ReportResponseDTO(List.of(ex.getMessage())),
-                HttpStatus.NOT_FOUND  // 404
-        );
-    }
 }

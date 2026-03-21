@@ -1,7 +1,8 @@
 package com.wasel.service;
-
+import com.wasel.dto.PagedReportResponse;
 import com.wasel.dto.ReportRequestDTO;
 import com.wasel.dto.ReportResponseDTO;
+import com.wasel.dto.ReportSummaryDTO;
 import com.wasel.entity.Checkpoint;
 import com.wasel.entity.Report;
 import com.wasel.entity.User;
@@ -13,12 +14,15 @@ import com.wasel.model.ModerationActionType;
 import com.wasel.model.ReportStatus;
 import com.wasel.repository.ReportRepository;
 import com.wasel.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReportService {
@@ -42,10 +46,11 @@ public class ReportService {
         Category categoryEnum = validateReportDTO(dto);
 
         // 2. Check abuse
-        checkAbuse(dto.getUserId(), dto.getLatitude(), dto.getLongitude());
+        User currentUser = getCurrentUser(); // Get user from token
+        checkAbuse(currentUser.getId(), dto.getLatitude(), dto.getLongitude());
 
         // 3. Create & save report
-        return createAndSaveReport(dto, categoryEnum);
+        return createAndSaveReport(dto, categoryEnum , currentUser);
     }
 
     private Category validateReportDTO(ReportRequestDTO dto)
@@ -113,9 +118,7 @@ public class ReportService {
         if (!errors.isEmpty()) {throw new ValidationException(errors);}
     }
 
-    private ReportResponseDTO createAndSaveReport(ReportRequestDTO dto, Category categoryEnum) {
-        User currentUser = getCurrentUser();
-
+    private ReportResponseDTO createAndSaveReport(ReportRequestDTO dto, Category categoryEnum ,  User currentUser) {
         Report report = new Report();
         report.setCreatedBy(currentUser);
         report.setDescription(dto.getDescription());
@@ -149,11 +152,17 @@ public class ReportService {
             );
         }
 
-        return new ReportResponseDTO(List.of(
-                savedReport.getStatus() == ReportStatus.DUPLICATE
-                        ? "Report submitted but marked as duplicate"
-                        : "Report submitted successfully and is now in Unverified Reports"
-        ));
+        String message = savedReport.getStatus() == ReportStatus.DUPLICATE
+                ? "Report submitted but marked as duplicate of report #" +
+                savedReport.getDuplicateOfReport().getReportId()
+                : "Report submitted successfully and is now in Unverified Reports";
+
+        return new ReportResponseDTO(
+                savedReport.getReportId(),
+                savedReport.getStatus(),
+                savedReport.getTimestamp(),
+                message
+        );
     }
     private void handleDuplicateDetection(Report report) {
         double range = 0.005; // about 500m
@@ -180,10 +189,58 @@ public class ReportService {
         report.setStatus(ReportStatus.PENDING);
     }
 
-    private User getCurrentUser() {
+    private User getCurrentUser()
+    {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (User) authentication.getPrincipal();
 
+    }
+
+    /**
+     * Retrieves all reports with optional filters for status and category.
+     * Returns a clean paginated response with only essential metadata.
+     */
+    public PagedReportResponse getAllReports(ReportStatus status, Category category, Pageable pageable) {
+        Page<Report> reports = reportRepository.findAllWithFilters(status, category, pageable);
+
+        List<ReportSummaryDTO> reportList = reports.getContent().stream()
+                .map(report -> new ReportSummaryDTO(
+                        report.getReportId(),
+                        report.getCategory(),
+                        report.getDescription(),
+                        report.getLatitude(),
+                        report.getLongitude(),
+                        report.getStatus(),
+                        report.getTimestamp()
+                ))
+                .collect(Collectors.toList());
+
+        return new PagedReportResponse(
+                reportList,
+                reports.getNumber(),        // current page
+                reports.getTotalPages(),    // total pages
+                reports.getTotalElements(), // total reports
+                reports.getSize()           // page size
+        );
+    }
+
+    /**
+     * Retrieves a single report by its ID.
+     */
+    public ReportSummaryDTO getReportById(Long reportId)
+    {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Report not found with id: " + reportId));
+        return new ReportSummaryDTO(
+                report.getReportId(),
+                report.getCategory(),
+                report.getDescription(),
+                report.getLatitude(),
+                report.getLongitude(),
+                report.getStatus(),
+                report.getTimestamp()
+        );
     }
 }
 

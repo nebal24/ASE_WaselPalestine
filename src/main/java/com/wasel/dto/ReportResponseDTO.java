@@ -1,5 +1,5 @@
 package com.wasel.dto;
-import com.wasel.model.Status;
+import com.wasel.model.ReportStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -8,15 +8,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class ReportResponseDTO {
 
     // For success responses
-    private Integer reportId;
-    private Status status;
+    private Long reportId;
+    private ReportStatus status;
     private LocalDateTime timestamp;
     private String message;
     // For error responses
     private List<String> errors;
 
     // Success constructor
-    public ReportResponseDTO(Integer reportId, Status status, LocalDateTime timestamp, String message) {
+    public ReportResponseDTO(Long reportId, ReportStatus status, LocalDateTime timestamp, String message) {
         this.reportId  = reportId;
         this.status    = status;
         this.timestamp = timestamp;
@@ -25,10 +25,10 @@ public class ReportResponseDTO {
     // Error constructor
     public ReportResponseDTO(List<String> errors) {this.errors = errors;}
 
-    public Integer getReportId()            { return reportId; }
-    public void setReportId(Integer id)     { this.reportId = id; }
-    public Status getStatus()               { return status; }
-    public void setStatus(Status status)    { this.status = status; }
+    public Long getReportId()            { return reportId; }
+    public void setReportId(Long id)     { this.reportId = id; }
+    public ReportStatus getStatus()               { return status; }
+    public void setStatus(ReportStatus status)    { this.status = status; }
     public LocalDateTime getTimestamp()              { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp){ this.timestamp = timestamp; }
     public String getMessage()              { return message; }
