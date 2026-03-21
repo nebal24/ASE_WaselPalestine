@@ -1,6 +1,6 @@
 package com.wasel.model;
 
-public enum Status {
+public enum ReportStatus {
     PENDING,
     VERIFIED,
     REJECTED,
