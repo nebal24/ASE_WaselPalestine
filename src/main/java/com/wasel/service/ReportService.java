@@ -1,4 +1,5 @@
 package com.wasel.service;
+
 import com.wasel.dto.ReportRequestDTO;
 import com.wasel.dto.ReportResponseDTO;
 import com.wasel.entity.Checkpoint;
@@ -8,9 +9,11 @@ import com.wasel.exception.ResourceNotFoundException;
 import com.wasel.repository.CheckpointRepository;
 import com.wasel.exception.ValidationException;
 import com.wasel.model.Category;
-import com.wasel.model.Status;
+import com.wasel.model.ModerationActionType;
+import com.wasel.model.ReportStatus;
 import com.wasel.repository.ReportRepository;
 import com.wasel.repository.UserRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -22,12 +25,15 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final CheckpointRepository checkpointRepository;
     private final UserRepository userRepository;
+    private final ModerationAuditService moderationAuditService;
 
-    public ReportService(ReportRepository reportRepository, CheckpointRepository checkpointRepository , UserRepository userRepository  )
+    public ReportService(ReportRepository reportRepository, CheckpointRepository checkpointRepository
+            , UserRepository userRepository ,  ModerationAuditService moderationAuditService )
     {
         this.reportRepository = reportRepository;
         this.checkpointRepository = checkpointRepository;
         this.userRepository = userRepository;
+        this.moderationAuditService = moderationAuditService;
     }
 
     public ReportResponseDTO createReportFromDTO(ReportRequestDTO dto)
@@ -42,7 +48,8 @@ public class ReportService {
         return createAndSaveReport(dto, categoryEnum);
     }
 
-    private Category validateReportDTO(ReportRequestDTO dto) {
+    private Category validateReportDTO(ReportRequestDTO dto)
+    {
         List<String> errors = new ArrayList<>();
 
         // Validate description
@@ -60,7 +67,6 @@ public class ReportService {
         } else if (dto.getLatitude() < 31 || dto.getLatitude() > 32.5) {
             errors.add("Latitude must be between 31.0 and 32.5 for Palestine");
         }
-
         if (dto.getLongitude() == null) {
             errors.add("Longitude must be provided");
         } else if (dto.getLongitude() < 34 || dto.getLongitude() > 35.5) {
@@ -108,21 +114,14 @@ public class ReportService {
     }
 
     private ReportResponseDTO createAndSaveReport(ReportRequestDTO dto, Category categoryEnum) {
-//        // GET THE LOGGED-IN USER FROM THE JWT TOKEN
-//        User currentUser = (User) SecurityContextHolder
-//                .getContext()
-//                .getAuthentication()
-//                .getPrincipal()userRepository;
+        User currentUser = getCurrentUser();
 
         Report report = new Report();
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        report.setUser(user);
+        report.setCreatedBy(currentUser);
         report.setDescription(dto.getDescription());
         report.setLatitude(dto.getLatitude());
         report.setLongitude(dto.getLongitude());
         report.setCategory(categoryEnum);
-//        report.setUser(currentUser);
 
         // ربط الـ checkpoint لو المواطن بعث ID
         if (dto.getRelatedCheckpointId() != null)
@@ -135,15 +134,56 @@ public class ReportService {
             report.setCheckpoint(checkpoint);
         }
 
-        // save() returns the saved entity WITH the generated ID and timestamp
-        Report saved = reportRepository.save(report);
+        handleDuplicateDetection(report);
 
-        return new ReportResponseDTO(
-                saved.getReportId(),
-                saved.getStatus(),
-                saved.getTimestamp(),
-                "Report submitted successfully and is now in Unverified Reports"
-        );
+        Report savedReport = reportRepository.save(report);
+
+        if (savedReport.getStatus() == ReportStatus.DUPLICATE
+                && savedReport.getDuplicateOfReport() != null) {
+            moderationAuditService.log(
+                    savedReport,
+                    currentUser,
+                    ModerationActionType.AUTO_MARK_DUPLICATE,
+                    "Automatically marked as duplicate of report #" +
+                            savedReport.getDuplicateOfReport().getReportId()
+            );
+        }
+
+        return new ReportResponseDTO(List.of(
+                savedReport.getStatus() == ReportStatus.DUPLICATE
+                        ? "Report submitted but marked as duplicate"
+                        : "Report submitted successfully and is now in Unverified Reports"
+        ));
+    }
+    private void handleDuplicateDetection(Report report) {
+        double range = 0.005; // about 500m
+        LocalDateTime threshold = LocalDateTime.now().minusMinutes(15);
+
+        List<Report> nearbyReports =
+                reportRepository.findByCategoryAndStatusInAndLatitudeBetweenAndLongitudeBetweenAndTimestampAfter(
+                        report.getCategory(),
+                        List.of(ReportStatus.PENDING, ReportStatus.VERIFIED),
+                        report.getLatitude() - range,
+                        report.getLatitude() + range,
+                        report.getLongitude() - range,
+                        report.getLongitude() + range,
+                        threshold
+                );
+
+        if (!nearbyReports.isEmpty()) {
+            Report originalReport = nearbyReports.get(0);
+            report.setStatus(ReportStatus.DUPLICATE);
+            report.setDuplicateOfReport(originalReport);
+            return;
+        }
+
+        report.setStatus(ReportStatus.PENDING);
+    }
+
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
+
     }
 }
 

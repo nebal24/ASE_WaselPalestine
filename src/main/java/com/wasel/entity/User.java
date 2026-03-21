@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -128,5 +129,11 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return isActive;
     }
+
+    @OneToMany(mappedBy = "user")
+    private List<Vote> votes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "performedBy")
+    private List<ModerationAction> moderationActions = new ArrayList<>();
 
 }
