@@ -1,14 +1,17 @@
 package com.wasel.dto;
-import com.wasel.model.Category;
 
-// // Container for user input data when creating a report
+// Container for user input data when creating a report
 public class ReportRequestDTO {
     private String description;
     private String  category;
     private Double latitude;
     private Double longitude;
+    private Long relatedCheckpointId;   // optional - ممكن يكون null
+    private Long userId; // temporary until JWT is connected
 
-    // Getters & Setters
+    public Long getRelatedCheckpointId() { return relatedCheckpointId; }
+    public void setRelatedCheckpointId(Long id) { this.relatedCheckpointId = id; }
+
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
@@ -20,4 +23,7 @@ public class ReportRequestDTO {
 
     public Double getLongitude() { return longitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 }

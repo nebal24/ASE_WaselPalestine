@@ -1,12 +1,10 @@
 spring:
-  main:
-    allow-circular-references: true
-
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   datasource:
-    url: jdbc:postgresql://localhost:5432/WaselPalestine
+    url: jdbc:postgresql://localhost:5433/WaselPalestine
     username: postgres
-    password: 12345
-
+    password: 362004afnan
   jpa:
     hibernate:
       ddl-auto: update

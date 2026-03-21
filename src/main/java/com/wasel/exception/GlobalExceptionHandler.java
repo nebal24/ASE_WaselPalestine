@@ -14,8 +14,18 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ReportResponseDTO> handleValidationException(ValidationException ex) {
+    public ResponseEntity<ReportResponseDTO> handleValidationException(ValidationException ex)
+    {
         // Return the errors list inside ReportResponseDTO
         return new ResponseEntity<>(new ReportResponseDTO(ex.getErrors()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ReportResponseDTO> handleResourceNotFoundException(ResourceNotFoundException ex)
+    {
+        return new ResponseEntity<>(
+                new ReportResponseDTO(List.of(ex.getMessage())),
+                HttpStatus.NOT_FOUND  // 404
+        );
     }
 }

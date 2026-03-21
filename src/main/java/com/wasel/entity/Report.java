@@ -13,17 +13,13 @@ public class Report {
     @Column(name = "report_id")
     private Integer reportId;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User user;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "related_checkpoint_id", nullable = true)
-//    private Checkpoint checkpoint;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "related_incident_id", nullable = false)
-//    private Incident incident;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "related_checkpoint_id", nullable = true)
+    private Checkpoint checkpoint;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -59,7 +55,14 @@ public class Report {
     public void setCategory(Category category) {this.category = category;}
     public void setLatitude(Double latitude) {this.latitude = latitude;}
     public void setLongitude(Double longitude) {this.longitude = longitude;}
+    public Integer getReportId()             { return reportId; }
+    public Status getStatus()                { return status; }
+    public LocalDateTime getTimestamp()      { return timestamp; }
+    public void setStatus(Status status)     { this.status = status; }
 
 
-   // public void setUser(User mockUser) {this.user=mockUser;}
+    public void setCheckpoint(Checkpoint checkpoint) {this.checkpoint=checkpoint;}
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }
