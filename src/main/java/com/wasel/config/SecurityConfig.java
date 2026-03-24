@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import org.springframework.http.HttpMethod;
 /**
  * Security configuration class for the application
  * Configures JWT authentication, authorization rules, and security filters
@@ -44,9 +44,10 @@ public class SecurityConfig {
 
                 // Configure authorization rules for endpoints
                 .authorizeHttpRequests(auth -> auth
-                        // Allow all auth endpoints (register/login) without token
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        // All other endpoints require authentication
+                        .requestMatchers(HttpMethod.GET, "/api/v1/incidents/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/checkpoints/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/reports/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

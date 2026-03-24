@@ -4,6 +4,7 @@ import com.wasel.dto.ModerationDecisionRequest;
 import com.wasel.entity.User;
 import com.wasel.service.ModerationService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ public class ModerationController {
     }
 
     @PostMapping("/{reportId}/moderation/verify")
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> verifyReport(
             @PathVariable Long reportId,
             @RequestBody ModerationDecisionRequest request,
@@ -31,6 +33,7 @@ public class ModerationController {
     }
 
     @PostMapping("/{reportId}/moderation/reject")
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> rejectReport(
             @PathVariable Long reportId,
             @RequestBody ModerationDecisionRequest request,
@@ -42,6 +45,8 @@ public class ModerationController {
     }
 
     @PostMapping("/{reportId}/moderation/duplicate")
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+
     public ResponseEntity<Map<String, Object>> markDuplicate(
             @PathVariable Long reportId,
             @RequestBody ModerationDecisionRequest request,
