@@ -2,13 +2,16 @@ package com.wasel.controller;
 
 import com.wasel.entity.Checkpoint;
 import com.wasel.entity.CheckpointStatusHistory;
+import com.wasel.entity.User;
 import com.wasel.model.CheckpointStatus;
 import com.wasel.service.CheckpointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -23,9 +26,9 @@ public class CheckpointController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Checkpoint> createCheckpoint(
             @RequestBody Checkpoint checkpoint,
-            @RequestAttribute Long userId) {
+            @AuthenticationPrincipal User user) {   // ← هاد الصح
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(checkpointService.createCheckpoint(checkpoint, userId));
+                .body(checkpointService.createCheckpoint(checkpoint, user.getId()));
     }
 
     @PatchMapping("/{id}/status")

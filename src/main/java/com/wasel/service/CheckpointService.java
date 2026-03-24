@@ -32,8 +32,7 @@ public class CheckpointService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         checkpoint.setCurrentStatus(CheckpointStatus.OPEN);
-        Checkpoint saved = checkpointRepository.save(checkpoint);
-
+        Checkpoint saved = checkpointRepository.saveAndFlush(checkpoint);
         saveStatusHistory(saved, CheckpointStatus.OPEN, user);
         return saved;
     }
