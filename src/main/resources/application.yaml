@@ -1,6 +1,4 @@
 spring:
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   datasource:
     url: jdbc:postgresql://localhost:5432/WaselPalestine
     username: postgres
@@ -12,7 +10,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
+  open-in-view: false
 server:
   port: 8081
 

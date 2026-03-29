@@ -5,19 +5,47 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Data Transfer Object for route estimation responses
- * Contains the calculated route information
+ * DTO for route estimation response
+ * Contains distance, duration, and explanatory metadata
  */
 @Data
 @Builder
 public class RouteResponseDTO {
 
-    /** Estimated distance in kilometers (rounded to 1 decimal) */
-    private Double distanceKm;
+    // Estimated distance in kilometers
+    private Double estimatedDistance;
 
-    /** Estimated travel time in minutes */
-    private Integer durationMinutes;
+    // Estimated duration in minutes
+    private Double estimatedDuration;
 
-    /** List of explanatory messages about the route calculation */
-    private List<String> metadata;
+    // Metadata explaining factors that affect this route
+    private RouteMetadata metadata;
+
+    @Data
+    @Builder
+    public static class RouteMetadata {
+
+        // Human-readable list of factors affecting the route
+        // e.g. ["Checkpoint CLOSED on route", "Active incident near destination"]
+        private List<String> factors;
+
+        // Checkpoints that are closed or delayed along the route
+        private List<AffectedCheckpoint> affectedCheckpoints;
+
+        // Areas that were requested to be avoided
+        private List<String> avoidedAreas;
+
+        // Whether the route was modified due to constraints
+        private boolean routeModified;
+    }
+
+    @Data
+    @Builder
+    public static class AffectedCheckpoint {
+        private Long id;
+        private String name;
+        private String status;
+        private Double latitude;
+        private Double longitude;
+    }
 }

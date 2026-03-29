@@ -10,4 +10,7 @@ import java.util.List;
 public interface CheckpointStatusHistoryRepository extends JpaRepository<CheckpointStatusHistory, Long> {
     List<CheckpointStatusHistory> findByCheckpointId(Long checkpointId);
 
+    // New: return history entries for a checkpoint ordered by updatedAt descending
+    List<CheckpointStatusHistory> findByCheckpointIdOrderByUpdatedAtDesc(Long checkpointId);
+
 }

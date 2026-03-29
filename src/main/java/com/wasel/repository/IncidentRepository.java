@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Repository interface for Incident entity operations
@@ -46,6 +47,14 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
      * @return page of incidents matching the status
      */
     Page<Incident> findByStatus(IncidentStatus status, Pageable pageable);
+
+    /**
+     * Find incidents by a list of statuses.
+     *
+     * @param statuses list of statuses to match
+     * @return list of incidents with any of the provided statuses
+     */
+    List<Incident> findByStatusIn(List<IncidentStatus> statuses);
 
     /**
      * Find all incidents associated with a specific checkpoint

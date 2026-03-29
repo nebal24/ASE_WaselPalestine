@@ -1,79 +1,74 @@
 package com.wasel.service;
 
 import com.wasel.dto.AlertResponse;
-import com.wasel.dto.WeatherResponse;
 import com.wasel.entity.Alert;
 import com.wasel.entity.AlertSubscription;
 import com.wasel.entity.Incident;
-import com.wasel.model.AlertStatus;
 import com.wasel.repository.AlertRepository;
 import com.wasel.repository.AlertSubscriptionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service to check active alert subscriptions against verified incidents.
+ * Currently logs matches; notification sending will be integrated later.
+ */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AlertService {
 
+    private final AlertSubscriptionRepository subscriptionRepository;
     private final AlertRepository alertRepository;
-    private final AlertSubscriptionRepository alertSubscriptionRepository;
-    private final NotificationService notificationService;
-    private final WeatherService weatherService;
 
-    public void triggerAlertsForIncident(Incident incident)
-    {
+    /**
+     * Check active subscriptions and log those matching the incident by category and proximity.
+     */
+    public void triggerAlertsForIncident(Incident incident) {
+        if (incident == null) return;
 
-        // Step 1: find all active subscriptions that match
-        // this incident's category and location
-        List<AlertSubscription> matchingSubscriptions =
-                alertSubscriptionRepository.findActiveMatchingSubscriptions(
-                        incident.getCategory(),
-                        incident.getLatitude(),
-                        incident.getLongitude()
-                );
+        // Use repository query that checks category and geographic proximity
+        List<AlertSubscription> matches = subscriptionRepository.findActiveMatchingSubscriptions(
+                incident.getCategory(),
+                incident.getLatitude(),
+                incident.getLongitude()
+        );
 
-        // Step 2: for each matching subscription,
-        // create one alert record for that user
-        for (AlertSubscription subscription : matchingSubscriptions)
-        {
-            Alert alert = new Alert();
-            alert.setUser(subscription.getUser());
-            alert.setIncident(incident);
-            alert.setStatus(AlertStatus.PENDING);
+        if (matches == null || matches.isEmpty()) {
+            log.info("No alert subscriptions match incident={}", incident.getIncidentId());
+            return;
+        }
 
-            alertRepository.save(alert);
-
-            // Step 3: hand it off to the notification service
-            // right now this does nothing — but in the future
-            // it will send email, SMS, push, etc.
-            notificationService.send(alert);
+        for (AlertSubscription sub : matches) {
+            log.info("Alert match: subscriptionId={} userId={} incidentId={}",
+                    sub.getId(), sub.getUser() != null ? sub.getUser().getId() : null,
+                    incident.getIncidentId());
         }
     }
 
-    public List<AlertResponse> getMyAlerts(Long userId)
-    {
-        return alertRepository.findByUserIdOrderByCreatedAtDesc(userId)
-                .stream()
-                .map(alert -> {
-                    // Fetch weather for the incident's location
-                    WeatherResponse weather = weatherService.getWeather(
-                            alert.getIncident().getLatitude(),
-                            alert.getIncident().getLongitude()
-                    );
-                  return new AlertResponse(
-
-                            alert.getId(),
-                            alert.getIncident().getIncidentId(),
-                            alert.getIncident().getCategory(),
-                            alert.getIncident().getLatitude(),
-                            alert.getIncident().getLongitude(),
-                            alert.getStatus(),
-                            alert.getCreatedAt(),
-                            weather
-                    );
-                })
-                .toList();
+    /**
+     * Return alerts for a given user, newest first
+     */
+    public List<AlertResponse> getMyAlerts(Long userId) {
+        List<Alert> alerts = alertRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<AlertResponse> result = new ArrayList<>();
+        if (alerts == null) return result;
+        for (Alert a : alerts) {
+            AlertResponse r = new AlertResponse();
+            r.setId(a.getId());
+            r.setIncidentId(a.getIncident() != null ? a.getIncident().getIncidentId() : null);
+            r.setIncidentCategory(a.getIncident() != null ? a.getIncident().getCategory() : null);
+            r.setIncidentLatitude(a.getIncident() != null ? a.getIncident().getLatitude() : null);
+            r.setIncidentLongitude(a.getIncident() != null ? a.getIncident().getLongitude() : null);
+            r.setStatus(a.getStatus());
+            r.setCreatedAt(a.getCreatedAt());
+            r.setWeather(null);
+            result.add(r);
+        }
+        return result;
     }
 }

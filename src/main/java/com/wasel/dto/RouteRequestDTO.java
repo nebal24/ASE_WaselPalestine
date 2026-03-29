@@ -1,26 +1,26 @@
 package com.wasel.dto;
 
 import lombok.Data;
+import java.util.List;
 
 /**
- * Data Transfer Object for route estimation requests
- * Contains the start and end coordinates for route calculation
+ * DTO for route estimation request
+ * Contains origin, destination, and constraint parameters
  */
+
 @Data
 public class RouteRequestDTO {
+    // Origin coordinates
+    private Double originLat;
+    private Double originLon;
 
-    /** Starting point latitude */
-    private Double startLat;
+    // Destination coordinates
+    private Double destinationLat;
+    private Double destinationLon;
 
-    /** Starting point longitude  */
-    private Double startLng;
+    // If true, route will avoid all CLOSED or DELAYED checkpoints
+    private boolean avoidCheckpoints = false;
 
-    /** Destination latitude */
-    private Double endLat;
-
-    /** Destination longitude */
-    private Double endLng;
-
-    /** Optional: whether to avoid checkpoints on the route */
-    private boolean avoidCheckpoints;
+    // List of area names to avoid (e.g. "Huwara", "Beita")
+    private List<String> avoidAreas;
 }

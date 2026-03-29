@@ -1,5 +1,6 @@
 package com.wasel.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wasel.model.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -50,6 +51,7 @@ public class User implements UserDetails {
      * Never stored as plain text
      */
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     /**

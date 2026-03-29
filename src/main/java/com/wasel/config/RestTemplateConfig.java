@@ -1,6 +1,7 @@
 package com.wasel.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -20,9 +21,12 @@ public class RestTemplateConfig {
      * Creates a RestTemplate bean with custom timeout and UTF-8 support
      * Used for making HTTP requests to external APIs
      *
+     * Only defines the bean if no other RestTemplate bean is present to avoid conflicts.
+     *
      * @return Configured RestTemplate instance
      */
     @Bean
+    @ConditionalOnMissingBean(RestTemplate.class)
     public RestTemplate restTemplate() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(10000);

@@ -3,6 +3,7 @@ package com.wasel.controller;
 import com.wasel.dto.IncidentDTO;
 import com.wasel.dto.IncidentFilterDTO;
 import com.wasel.dto.IncidentRequestDTO;
+import com.wasel.exception.ResourceNotFoundException;
 import com.wasel.service.IncidentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -134,7 +135,7 @@ public class IncidentController {
      * @return No content (204) on successful deletion
      */
     @DeleteMapping("/{id}")
-    // @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+     @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteIncident(
             @PathVariable Long id,
             @AuthenticationPrincipal User user) {

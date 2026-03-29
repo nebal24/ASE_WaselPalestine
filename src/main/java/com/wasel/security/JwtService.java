@@ -56,8 +56,12 @@ public class JwtService {
      * @return JWT token string
      */
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
-    }
+        Map<String, Object> extraClaims = new HashMap<>();
+        if (userDetails instanceof com.wasel.entity.User user) {
+            extraClaims.put("userId", user.getId());
+            extraClaims.put("role", user.getRole().name());
+        }
+        return generateToken(extraClaims, userDetails);    }
 
     /**
      * Generates JWT token with additional claims
@@ -134,4 +138,5 @@ public class JwtService {
         byte[] keyBytes = SECRET_KEY.getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
 }

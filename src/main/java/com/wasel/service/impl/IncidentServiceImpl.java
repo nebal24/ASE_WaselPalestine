@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 
 /**
  * Implementation of IncidentService interface
@@ -177,6 +178,7 @@ public class IncidentServiceImpl implements IncidentService {
         // Update status and set verifier
         incident.setStatus(IncidentStatus.VERIFIED);
         incident.setVerifiedBy(moderator);
+        incident.setVerifiedAt(LocalDateTime.now());
 
         // Save
         Incident verifiedIncident = incidentRepository.save(incident);
