@@ -5,6 +5,7 @@ import com.wasel.dto.RouteResponseDTO;
 import com.wasel.dto.RouteResponseDTO.AffectedCheckpoint;
 import com.wasel.dto.RouteResponseDTO.RouteMetadata;
 import com.wasel.entity.Checkpoint;
+import com.wasel.entity.Incident;
 import com.wasel.model.CheckpointStatus;
 import com.wasel.model.IncidentStatus;
 import com.wasel.repository.CheckpointRepository;
@@ -66,19 +67,31 @@ public class RouteMetadataService {
                 factors.add("Checkpoint '" + cp.getName() + "' is CLOSED on this route");
 
                 // If user wants to avoid checkpoints, note that route was modified
-                if (request.isAvoidCheckpoints()) {
-                    factors.add("Route adjusted to avoid closed checkpoint: " + cp.getName());
+                if (request.isAvoidCheckpoints() &&
+                    (cp.getCurrentStatus() == CheckpointStatus.CLOSED ||
+                     cp.getCurrentStatus() == CheckpointStatus.DELAYED)) {
+                    factors.add("Route adjusted to avoid checkpoint: " + cp.getName());
                     routeModified = true;
                 }
             } else if (cp.getCurrentStatus() == CheckpointStatus.DELAYED) {
                 affectedCheckpoints.add(buildAffectedCheckpoint(cp));
                 factors.add("Checkpoint '" + cp.getName() + "' has DELAYS — expect longer wait times");
+
+                // If requested to avoid checkpoints, also mark delayed checkpoints
+                if (request.isAvoidCheckpoints() &&
+                    (cp.getCurrentStatus() == CheckpointStatus.CLOSED ||
+                     cp.getCurrentStatus() == CheckpointStatus.DELAYED)) {
+                    factors.add("Route adjusted to avoid checkpoint: " + cp.getName());
+                    routeModified = true;
+                }
             }
         }
 
         // Step 3: Check for active incidents near the route
-        long activeIncidents = incidentRepository.findAll().stream()
-                .filter(i -> i.getStatus() == IncidentStatus.OPEN || i.getStatus() == IncidentStatus.VERIFIED)
+        List<Incident> activeIncidents = incidentRepository
+                .findByStatusIn(List.of(IncidentStatus.OPEN, IncidentStatus.VERIFIED));
+
+        long nearbyActiveIncidents = activeIncidents.stream()
                 .filter(i -> isNearRoute(
                         i.getLatitude(), i.getLongitude(),
                         request.getOriginLat(), request.getOriginLon(),
@@ -86,8 +99,8 @@ public class RouteMetadataService {
                 ))
                 .count();
 
-        if (activeIncidents > 0) {
-            factors.add("There are " + activeIncidents + " active incident(s) near this route");
+        if (nearbyActiveIncidents > 0) {
+            factors.add("There are " + nearbyActiveIncidents + " active incident(s) near this route");
         }
 
         // Step 4: Apply avoidAreas constraint
@@ -96,6 +109,16 @@ public class RouteMetadataService {
                 avoidedAreas.add(area);
                 factors.add("Route adjusted to avoid area: " + area);
                 routeModified = true;
+
+                nearbyCheckpoints.stream()
+                    .filter(cp -> cp.getName().toLowerCase().contains(area.toLowerCase()))
+                    .forEach(cp -> {
+                        boolean alreadyAdded = affectedCheckpoints.stream()
+                            .anyMatch(a -> a.getId().equals(cp.getId()));
+                        if (!alreadyAdded) {
+                            affectedCheckpoints.add(buildAffectedCheckpoint(cp));
+                        }
+                    });
             }
         }
 
@@ -138,22 +161,32 @@ public class RouteMetadataService {
 
     /**
      * Check if a point (pointLat, pointLon) is near the route from origin to destination.
-     * Uses distance from point to the midpoint of the route as a simple heuristic.
-     *
-     * @return true if within ROUTE_PROXIMITY_KM of the route midpoint
+     * Uses perpendicular distance to the segment as the check.
      */
     private boolean isNearRoute(double pointLat, double pointLon,
                                 double originLat, double originLon,
                                 double destLat, double destLon) {
-        // Use midpoint of route as approximation
-        double midLat = (originLat + destLat) / 2;
-        double midLon = (originLon + destLon) / 2;
+        double distToSegment = distanceToSegment(
+            pointLat, pointLon,
+            originLat, originLon,
+            destLat, destLon
+        );
+        return distToSegment <= ROUTE_PROXIMITY_KM;
+    }
 
-        double distToMid = haversineDistance(pointLat, pointLon, midLat, midLon);
-        double routeLength = haversineDistance(originLat, originLon, destLat, destLon);
-
-        // Point is "near route" if within ROUTE_PROXIMITY_KM or within half the route length
-        return distToMid <= Math.max(ROUTE_PROXIMITY_KM, routeLength / 2);
+    private double distanceToSegment(double pLat, double pLon,
+                                      double aLat, double aLon,
+                                      double bLat, double bLon) {
+        double dx = bLon - aLon;
+        double dy = bLat - aLat;
+        if (dx == 0 && dy == 0) {
+            return haversineDistance(pLat, pLon, aLat, aLon);
+        }
+        double t = ((pLon - aLon) * dx + (pLat - aLat) * dy) / (dx * dx + dy * dy);
+        t = Math.max(0, Math.min(1, t));
+        double closestLat = aLat + t * dy;
+        double closestLon = aLon + t * dx;
+        return haversineDistance(pLat, pLon, closestLat, closestLon);
     }
 
     /**

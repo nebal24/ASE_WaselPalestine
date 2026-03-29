@@ -63,7 +63,7 @@ public class CheckpointService {
 
     @Transactional(readOnly = true)
     public List<CheckpointStatusHistory> getStatusHistory(Long checkpointId) {
-        return historyRepository.findByCheckpointId(checkpointId);
+        return historyRepository.findByCheckpointIdOrderByUpdatedAtDesc(checkpointId);
     }
 
     @Transactional

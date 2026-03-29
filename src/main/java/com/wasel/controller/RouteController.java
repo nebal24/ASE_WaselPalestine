@@ -47,6 +47,12 @@ public class RouteController {
             @RequestParam(defaultValue = "false") boolean avoidCheckpoints,
             @RequestParam(required = false) java.util.List<String> avoidAreas) {
 
+        // Validate coordinates
+        if (originLat < -90 || originLat > 90 || destinationLat < -90 || destinationLat > 90 ||
+            originLon < -180 || originLon > 180 || destinationLon < -180 || destinationLon > 180) {
+            return ResponseEntity.badRequest().build();
+        }
+
         // Build request DTO from query params
         RouteRequestDTO request = new RouteRequestDTO();
         request.setOriginLat(originLat);
