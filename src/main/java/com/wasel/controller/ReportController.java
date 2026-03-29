@@ -4,7 +4,7 @@ import com.wasel.dto.ReportRequestDTO;
 import com.wasel.dto.ReportResponseDTO;
 import com.wasel.dto.ReportSummaryDTO;
 import com.wasel.entity.Report;
-import com.wasel.model.Category;
+import com.wasel.model.IncidentCategory;
 import com.wasel.model.ReportStatus;
 import com.wasel.service.ReportService;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +42,7 @@ public class ReportController {
     @GetMapping
     public ResponseEntity<PagedReportResponse> getAllReports(
             @RequestParam(required = false) ReportStatus status,
-            @RequestParam(required = false) Category category,
+            @RequestParam(required = false) IncidentCategory category,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 

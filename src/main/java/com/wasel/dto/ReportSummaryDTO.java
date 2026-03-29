@@ -1,7 +1,7 @@
 package com.wasel.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.wasel.model.Category;
+import com.wasel.model.IncidentCategory;
 import com.wasel.model.ReportStatus;
 import java.time.LocalDateTime;
 
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class ReportSummaryDTO {
 
     private Long reportId;
-    private Category category;
+    private IncidentCategory category;
     private String description;
     private Double latitude;
     private Double longitude;
@@ -17,7 +17,7 @@ public class ReportSummaryDTO {
     private LocalDateTime timestamp;
 
     // Constructor
-    public ReportSummaryDTO(Long reportId, Category category, String description,
+    public ReportSummaryDTO(Long reportId, IncidentCategory category, String description,
                             Double latitude, Double longitude,
                             ReportStatus status, LocalDateTime timestamp) {
         this.reportId = reportId;
@@ -31,7 +31,7 @@ public class ReportSummaryDTO {
 
     // Getters
     public Long getReportId()          { return reportId; }
-    public Category getCategory()      { return category; }
+    public IncidentCategory getCategory()      { return category; }
     public String getDescription()     { return description; }
     public Double getLatitude()        { return latitude; }
     public Double getLongitude()       { return longitude; }

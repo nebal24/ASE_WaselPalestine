@@ -10,6 +10,7 @@ import com.wasel.model.IncidentStatus;
 import com.wasel.repository.IncidentRepository;
 import com.wasel.repository.UserRepository;
 import com.wasel.repository.CheckpointRepository;
+import com.wasel.service.AlertService;
 import com.wasel.service.IncidentService;
 import com.wasel.exception.ResourceNotFoundException;
 import com.wasel.exception.UnauthorizedException;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 /**
  * Implementation of IncidentService interface
@@ -35,6 +37,7 @@ public class IncidentServiceImpl implements IncidentService {
     private final IncidentRepository incidentRepository;
     private final UserRepository userRepository;
     private final CheckpointRepository checkpointRepository;
+    private final AlertService alertService;
 
     // Mapper for entity-DTO conversion
     private final IncidentMapper incidentMapper;
@@ -175,8 +178,12 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setStatus(IncidentStatus.VERIFIED);
         incident.setVerifiedBy(moderator);
 
-        // Save and return
+        // Save
         Incident verifiedIncident = incidentRepository.save(incident);
+
+        // Trigger alerts for all matching subscribers
+        alertService.triggerAlertsForIncident(verifiedIncident);
+
         return incidentMapper.toDTO(verifiedIncident);
     }
 
