@@ -2,9 +2,9 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   datasource:
-    url: jdbc:postgresql://localhost:5433/WaselPalestine
+    url: jdbc:postgresql://localhost:5432/WaselPalestine
     username: postgres
-    password: 362004afnan
+    password: 12345
   jpa:
     hibernate:
       ddl-auto: update
