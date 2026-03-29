@@ -65,25 +65,16 @@ public class RouteMetadataService {
             if (cp.getCurrentStatus() == CheckpointStatus.CLOSED) {
                 affectedCheckpoints.add(buildAffectedCheckpoint(cp));
                 factors.add("Checkpoint '" + cp.getName() + "' is CLOSED on this route");
-
-                // If user wants to avoid checkpoints, note that route was modified
-                if (request.isAvoidCheckpoints() &&
-                    (cp.getCurrentStatus() == CheckpointStatus.CLOSED ||
-                     cp.getCurrentStatus() == CheckpointStatus.DELAYED)) {
-                    factors.add("Route adjusted to avoid checkpoint: " + cp.getName());
-                    routeModified = true;
-                }
             } else if (cp.getCurrentStatus() == CheckpointStatus.DELAYED) {
                 affectedCheckpoints.add(buildAffectedCheckpoint(cp));
                 factors.add("Checkpoint '" + cp.getName() + "' has DELAYS — expect longer wait times");
+            }
 
-                // If requested to avoid checkpoints, also mark delayed checkpoints
-                if (request.isAvoidCheckpoints() &&
-                    (cp.getCurrentStatus() == CheckpointStatus.CLOSED ||
-                     cp.getCurrentStatus() == CheckpointStatus.DELAYED)) {
-                    factors.add("Route adjusted to avoid checkpoint: " + cp.getName());
-                    routeModified = true;
-                }
+            if (request.isAvoidCheckpoints() &&
+                (cp.getCurrentStatus() == CheckpointStatus.CLOSED ||
+                 cp.getCurrentStatus() == CheckpointStatus.DELAYED)) {
+                factors.add("Route adjusted to avoid checkpoint: " + cp.getName());
+                routeModified = true;
             }
         }
 
