@@ -38,7 +38,7 @@ public class Report {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Category category;
+    private IncidentCategory category;
 
     @Column(nullable = false, length = 300)
     private String description;
@@ -67,8 +67,8 @@ public class Report {
     public String getDescription() {return description;}
     public void setDescription(String description) {this.description = description;}
 
-    public Category getCategory() {return category;}
-    public void setCategory(Category category) {this.category = category;}
+    public IncidentCategory getCategory() {return category;}
+    public void setCategory(IncidentCategory category) {this.category = category;}
 
     public Double  getLatitude() {return latitude;}
     public void setLatitude(Double latitude) {this.latitude = latitude;}

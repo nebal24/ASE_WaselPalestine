@@ -9,7 +9,7 @@ import com.wasel.entity.User;
 import com.wasel.exception.ResourceNotFoundException;
 import com.wasel.repository.CheckpointRepository;
 import com.wasel.exception.ValidationException;
-import com.wasel.model.Category;
+import com.wasel.model.IncidentCategory;
 import com.wasel.model.ModerationActionType;
 import com.wasel.model.ReportStatus;
 import com.wasel.repository.ReportRepository;
@@ -43,7 +43,7 @@ public class ReportService {
     public ReportResponseDTO createReportFromDTO(ReportRequestDTO dto)
     {
         // 1. Validate input & convert category string to enum
-        Category categoryEnum = validateReportDTO(dto);
+        IncidentCategory categoryEnum = validateReportDTO(dto);
 
         // 2. Check abuse
         User currentUser = getCurrentUser(); // Get user from token
@@ -53,7 +53,7 @@ public class ReportService {
         return createAndSaveReport(dto, categoryEnum , currentUser);
     }
 
-    private Category validateReportDTO(ReportRequestDTO dto)
+    private IncidentCategory validateReportDTO(ReportRequestDTO dto)
     {
         List<String> errors = new ArrayList<>();
 
@@ -79,9 +79,9 @@ public class ReportService {
         }
 
         // Validate category
-        Category categoryEnum = null;
+        IncidentCategory categoryEnum = null;
         try {
-            categoryEnum = Category.valueOf(dto.getCategory());
+            categoryEnum = IncidentCategory.valueOf(dto.getCategory());
         } catch (Exception e) {
             errors.add("Category must be one of [ACCIDENT, DELAY, WEATHER_HAZARD, CLOSURE]");
         }
@@ -118,7 +118,7 @@ public class ReportService {
         if (!errors.isEmpty()) {throw new ValidationException(errors);}
     }
 
-    private ReportResponseDTO createAndSaveReport(ReportRequestDTO dto, Category categoryEnum ,  User currentUser) {
+    private ReportResponseDTO createAndSaveReport(ReportRequestDTO dto, IncidentCategory categoryEnum ,  User currentUser) {
         Report report = new Report();
         report.setCreatedBy(currentUser);
         report.setDescription(dto.getDescription());
@@ -200,7 +200,7 @@ public class ReportService {
      * Retrieves all reports with optional filters for status and category.
      * Returns a clean paginated response with only essential metadata.
      */
-    public PagedReportResponse getAllReports(ReportStatus status, Category category, Pageable pageable) {
+    public PagedReportResponse getAllReports(ReportStatus status, IncidentCategory category, Pageable pageable) {
         Page<Report> reports = reportRepository.findAllWithFilters(status, category, pageable);
 
         List<ReportSummaryDTO> reportList = reports.getContent().stream()

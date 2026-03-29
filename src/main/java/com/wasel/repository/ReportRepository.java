@@ -1,6 +1,6 @@
 package com.wasel.repository;
 import com.wasel.entity.Report;
-import com.wasel.model.Category;
+import com.wasel.model.IncidentCategory;
 import com.wasel.model.ReportStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,11 +47,11 @@ public interface ReportRepository extends JpaRepository<Report, Long>
             "ORDER BY r.timestamp DESC")
     Page<Report> findAllWithFilters(
             @Param("status") ReportStatus status,
-            @Param("category") Category category,
+            @Param("category") IncidentCategory category,
             Pageable pageable);
 
   List<Report> findByCategoryAndStatusInAndLatitudeBetweenAndLongitudeBetweenAndTimestampAfter(
-        Category category,
+          IncidentCategory category,
         List<ReportStatus> statuses,
         Double latMin, Double latMax,
         Double lonMin, Double lonMax,
