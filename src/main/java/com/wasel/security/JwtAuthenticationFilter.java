@@ -48,54 +48,51 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // 1. Extract Authorization header
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
 
-        // 2. Check if token exists and has correct format
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            // No token found - continue filter chain (will be rejected by security)
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 3. Extract JWT token (remove "Bearer " prefix)
         jwt = authHeader.substring(7);
 
-        // 4. Extract username (email) from token
-        userEmail = jwtService.extractUsername(jwt);
+        // ✅ Catch expired/malformed token here
+        try {
+            userEmail = jwtService.extractUsername(jwt);
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Token expired\", \"message\": \"Please refresh your token\"}");
+            return;
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Invalid token\", \"message\": \"Token is malformed or invalid\"}");
+            return;
+        }
 
-        // 5. If email extracted and user not already authenticated
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            // 6. Load user details from database
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-            // 7. Validate the token
             if (jwtService.isTokenValid(jwt, userDetails)) {
-
-                // 8. Create authentication token for Spring Security
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
+                        userDetails, null, userDetails.getAuthorities()
                 );
-
-                // 9. Add request details to authentication token
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-
-                // 10. Set authentication in SecurityContext
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-
-                // 11. Add userId as request attribute for controllers to use
                 request.setAttribute("userId", ((User) userDetails).getId());
+            } else {
+                // ✅ Token invalid (not expired, just wrong)
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Invalid token\", \"message\": \"Token validation failed\"}");
+                return;
             }
         }
 
-        // 12. Continue with the filter chain
         filterChain.doFilter(request, response);
     }
 }
