@@ -64,8 +64,10 @@ External APIs:
 Full architecture details available in:
 
 docs/02-architecture-diagram.md
+
 🌐 API Base URL
 http://localhost:8080/api/v1
+
 🚀 Quick Start
 Prerequisites
 Java 21
@@ -73,42 +75,30 @@ PostgreSQL
 Maven
 Docker (optional)
 Installation
-# Clone repository
 git clone https://github.com/nebal24/ASE_WaselPalestine.git
-
 cd ASE_WaselPalestine
-
-# Run project
 ./mvnw spring-boot:run
-Database Configuration
 
-Update:
-
-src/main/resources/application.yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/WaselPalestine
-    username: postgres
-    password: your_password
 👤 Test Users
-Role	Email	Password
-ADMIN	admin@wasel.ps
-	password123
-MODERATOR	moderator@wasel.ps
-	123456
-USER	user@wasel.ps
-	123456
+| Role      | Email                                           | Password    |
+| --------- | ----------------------------------------------- | ----------- |
+| ADMIN     | [admin@wasel.ps](mailto:admin@wasel.ps)         | password123 |
+| MODERATOR | [moderator@wasel.ps](mailto:moderator@wasel.ps) | 123456      |
+| USER      | [user@wasel.ps](mailto:user@wasel.ps)           | 123456      |
+
 📚 Project Documentation
-Document	Location
-API Documentation	API-Dog Collection
-Performance Report	Performance_Report.md
-System Overview	docs/01-system-overview.md
-Architecture Diagram	docs/02-architecture-diagram.md
-Database Schema (ERD)	docs/03-database-schema.md
-API Design Rationale	docs/04-api-design.md
-External APIs	docs/05-external-apis.md
-Testing Strategy	docs/06-testing-strategy.md
-Performance Results	docs/07-performance-results.md
+| Document             | Location                        |
+| -------------------- | ------------------------------- |
+| API Documentation    | API-Dog Collection              |
+| Performance Report   | Performance_Report.md           |
+| System Overview      | docs/01-system-overview.md      |
+| Architecture Diagram | docs/02-architecture-diagram.md |
+| Database Schema      | docs/03-database-schema.md      |
+| API Design           | docs/04-api-design.md           |
+| External APIs        | docs/05-external-apis.md        |
+| Testing Strategy     | docs/06-testing-strategy.md     |
+| Performance Results  | docs/07-performance-results.md  |
+
 🔍 Example API Endpoints
 POST   /api/v1/auth/login
 GET    /api/v1/incidents
@@ -116,33 +106,38 @@ POST   /api/v1/incidents
 PATCH  /api/v1/incidents/{id}/verify
 GET    /api/v1/routes/estimate
 GET    /api/v1/weather?lat=31.5&lon=34.4
+
 📊 Test Results
 API Testing (API-Dog)
 Total Tests: 33
 Passed: 33
 Failed: 0
 Performance Testing (k6)
-Scenario	VUs	Avg Response	p95	Error Rate
-Read-Heavy	10	331ms	3.03s	0%
-Write-Heavy	10	451ms	4.34s	0%
-Mixed	20	322ms	3.02s	0%
-Spike	200	317ms	3.01s	0%
-Soak (5 min)	20	14ms	31ms	0%
+| Scenario    | VUs | Avg Response | p95   | Error Rate |
+| ----------- | --- | ------------ | ----- | ---------- |
+| Read-Heavy  | 10  | 331ms        | 3.03s | 0%         |
+| Write-Heavy | 10  | 451ms        | 4.34s | 0%         |
+| Mixed       | 20  | 322ms        | 3.02s | 0%         |
+| Spike       | 200 | 317ms        | 3.01s | 0%         |
+| Soak        | 20  | 14ms         | 31ms  | 0%         |
+
 🔐 Security Features
 JWT Access + Refresh Tokens
 Password Encryption
 Role-Based Authorization
 Input Validation
-Protected Admin/Moderator Routes
-👥 Team Members
-Name	Contribution
-Amaal	Route Estimation, Performance Testing, Documentation
-Nebal	Authentication, Incidents API, Project Setup
-Member 3	Add contribution
-📅 Submission Deadline
+Protected Admin / Moderator Routes
 
-April 17, 2026
+👥 Team Members
+| Name  |
+|-------|
+| Amaal |
+| Nebal |
+| Afnan |
+| Sanaa |
 
 © 2026 Wasel Palestine
 
 Advanced Software Engineering Course Project
+
+
