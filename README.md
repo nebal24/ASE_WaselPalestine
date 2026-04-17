@@ -132,7 +132,7 @@ cd ASE_WaselPalestine
 | Amaal |
 | Nebal |
 | Afnan |
-| Sanaa |
+| Sana  |
 
 ---
 
