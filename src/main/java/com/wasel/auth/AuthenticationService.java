@@ -56,15 +56,11 @@ public class AuthenticationService {
                 .isActive(true)
                 .build();
 
-        // Save user to database
         userRepository.save(user);
 
-        // Generate JWT token for the new user
-        var jwtToken = jwtService.generateToken(user);
-
-        // Return token in response
         return AuthenticationResponse.builder()
-                .token(jwtToken)
+                .accessToken(jwtService.generateAccessToken(user))
+                .refreshToken(jwtService.generateRefreshToken(user))
                 .userId(user.getId())
                 .role(user.getRole().name())
                 .email(user.getEmail())
@@ -94,16 +90,12 @@ public class AuthenticationService {
                 )
         );
 
-        // Fetch user from database
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Generate JWT token
-        var jwtToken = jwtService.generateToken(user);
-
-        // Return token in response
         return AuthenticationResponse.builder()
-                .token(jwtToken)
+                .accessToken(jwtService.generateAccessToken(user))
+                .refreshToken(jwtService.generateRefreshToken(user))
                 .userId(user.getId())
                 .role(user.getRole().name())
                 .email(user.getEmail())

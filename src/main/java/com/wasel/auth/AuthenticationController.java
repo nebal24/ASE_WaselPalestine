@@ -46,9 +46,9 @@ public class AuthenticationController {
     }
 
     /**
-     * Refresh access token using a valid existing token
+     * Exchange a valid refresh token for a new access token.
      * POST /api/v1/auth/refresh-token
-     * Required by project spec: JWT (access + refresh tokens)
+     * Header: Authorization: Bearer <refresh_token>
      */
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(
@@ -59,19 +59,26 @@ public class AuthenticationController {
                     .body(Map.of("error", "Refresh token missing"));
         }
 
-        String refreshToken = authHeader.substring(7);
+        String token = authHeader.substring(7);
 
         try {
-            String userEmail = jwtService.extractUsername(refreshToken);
+            // Reject access tokens presented here — only refresh tokens are accepted
+            if (!jwtService.isRefreshToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Provided token is not a refresh token"));
+            }
+
+            String userEmail = jwtService.extractUsername(token);
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
-            if (jwtService.isTokenValid(refreshToken, userDetails)) {
-                String newToken = jwtService.generateToken(userDetails);
-                return ResponseEntity.ok(Map.of("token", newToken));
-            } else {
+            if (!jwtService.isTokenValid(token, userDetails)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "Invalid refresh token"));
+                        .body(Map.of("error", "Refresh token is expired or invalid"));
             }
+
+            String newAccessToken = jwtService.generateAccessToken(userDetails);
+            return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid refresh token"));
