@@ -7,11 +7,11 @@ import com.wasel.entity.Checkpoint;
 import com.wasel.entity.Report;
 import com.wasel.entity.User;
 import com.wasel.exception.ResourceNotFoundException;
-import com.wasel.repository.CheckpointRepository;
 import com.wasel.exception.ValidationException;
 import com.wasel.model.IncidentCategory;
 import com.wasel.model.ModerationActionType;
 import com.wasel.model.ReportStatus;
+import com.wasel.repository.CheckpointRepository;
 import com.wasel.repository.ReportRepository;
 import com.wasel.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -222,6 +222,30 @@ public class ReportService {
                 reports.getTotalElements(), // total reports
                 reports.getSize()           // page size
         );
+    }
+
+    /**
+     * Query 2 — Nearby Duplicate Reports.
+     *
+     * Delegates to the native Haversine query in ReportRepository and converts
+     * the returned Report entities to summary DTOs safe for serialization.
+     */
+    public List<ReportSummaryDTO> findNearbyDuplicateReports(
+            double latitude, double longitude, double radiusKm,
+            IncidentCategory category, int withinMinutes) {
+
+        return reportRepository
+                .findNearbyReports(latitude, longitude, radiusKm, category.name(), withinMinutes)
+                .stream()
+                .map(r -> new ReportSummaryDTO(
+                        r.getReportId(),
+                        r.getCategory(),
+                        r.getDescription(),
+                        r.getLatitude(),
+                        r.getLongitude(),
+                        r.getStatus(),
+                        r.getTimestamp()))
+                .toList();
     }
 
     /**

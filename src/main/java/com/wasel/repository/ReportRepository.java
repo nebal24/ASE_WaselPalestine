@@ -50,14 +50,54 @@ public interface ReportRepository extends JpaRepository<Report, Long>
             @Param("category") IncidentCategory category,
             Pageable pageable);
 
-  List<Report> findByCategoryAndStatusInAndLatitudeBetweenAndLongitudeBetweenAndTimestampAfter(
-          IncidentCategory category,
-        List<ReportStatus> statuses,
-        Double latMin, Double latMax,
-        Double lonMin, Double lonMax,
-        LocalDateTime threshold
-);
+    List<Report> findByCategoryAndStatusInAndLatitudeBetweenAndLongitudeBetweenAndTimestampAfter(
+            IncidentCategory category,
+            List<ReportStatus> statuses,
+            Double latMin, Double latMax,
+            Double lonMin, Double lonMax,
+            LocalDateTime threshold
+    );
 
-
-
+    /**
+     * Native query — Query 2: Nearby Duplicate Reports
+     *
+     * Finds reports of the same category submitted within a geographic radius
+     * (using the Haversine great-circle distance formula) and within a recent
+     * time window.  LEAST(1.0, ...) guards against floating-point values
+     * slightly above 1 that would make acos return NaN.
+     *
+     * Parameters:
+     *   latitude    – centre point latitude
+     *   longitude   – centre point longitude
+     *   radiusKm    – search radius in kilometres
+     *   category    – incident category name (e.g. "ACCIDENT")
+     *   withinMinutes – look-back window in minutes
+     *
+     * Used by: Duplicate detection to improve accuracy beyond bounding-box checks.
+     */
+    @Query(value = """
+            SELECT r.*
+            FROM reports r
+            WHERE r.category = :category
+              AND r.timestamp >= NOW() - (:withinMinutes * INTERVAL '1 minute')
+              AND (
+                    -- Haversine formula: straight-line distance on Earth's surface
+                    6371.0 * acos(
+                        LEAST(1.0,
+                            cos(radians(:latitude))  * cos(radians(r.latitude))
+                            * cos(radians(r.longitude) - radians(:longitude))
+                            + sin(radians(:latitude)) * sin(radians(r.latitude))
+                        )
+                    )
+                  ) <= :radiusKm
+            ORDER BY r.timestamp DESC
+            """,
+            nativeQuery = true)
+    List<Report> findNearbyReports(
+            @Param("latitude")     double latitude,
+            @Param("longitude")    double longitude,
+            @Param("radiusKm")     double radiusKm,
+            @Param("category")     String category,
+            @Param("withinMinutes") int withinMinutes
+    );
 }

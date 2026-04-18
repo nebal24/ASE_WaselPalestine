@@ -3,6 +3,7 @@ package com.wasel.service;
 import com.wasel.dto.CheckpointRequestDTO;
 import com.wasel.dto.CheckpointResponseDTO;
 import com.wasel.dto.CheckpointStatusHistoryDTO;
+import com.wasel.dto.TopViolatedCheckpointDTO;
 import com.wasel.entity.Checkpoint;
 import com.wasel.entity.CheckpointStatusHistory;
 import com.wasel.entity.User;
@@ -87,6 +88,20 @@ public class CheckpointService {
         history.setUpdatedAt(LocalDateTime.now());
         history.setUpdatedBy(user);
         historyRepository.save(history);
+    }
+
+    /** Query 1 — maps each Object[] row to a typed DTO. */
+    @Transactional(readOnly = true)
+    public List<TopViolatedCheckpointDTO> getTopViolatedCheckpoints() {
+        return checkpointRepository.findTopViolatedCheckpoints()
+                .stream()
+                .map(row -> TopViolatedCheckpointDTO.builder()
+                        .checkpointId(((Number) row[0]).longValue())
+                        .checkpointName((String) row[1])
+                        .incidentCount(((Number) row[2]).longValue())
+                        .averageSeverity(row[3] != null ? ((Number) row[3]).doubleValue() : null)
+                        .build())
+                .toList();
     }
 
     private CheckpointResponseDTO toDTO(Checkpoint cp) {
