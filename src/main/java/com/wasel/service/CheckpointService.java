@@ -26,6 +26,21 @@ public class CheckpointService {
     private final CheckpointStatusHistoryRepository historyRepository;
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
+    public List<CheckpointResponseDTO> getAllCheckpoints() {
+        return checkpointRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public CheckpointResponseDTO getCheckpointById(Long id) {
+        return checkpointRepository.findById(id)
+                .map(this::toDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Checkpoint not found with id: " + id));
+    }
+
     @Transactional
     public CheckpointResponseDTO createCheckpoint(CheckpointRequestDTO request, Long createdByUserId) {
         User user = userRepository.findById(createdByUserId)

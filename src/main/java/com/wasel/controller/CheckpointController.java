@@ -22,6 +22,16 @@ public class CheckpointController {
 
     private final CheckpointService checkpointService;
 
+    @GetMapping
+    public ResponseEntity<List<CheckpointResponseDTO>> getAllCheckpoints() {
+        return ResponseEntity.ok(checkpointService.getAllCheckpoints());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CheckpointResponseDTO> getCheckpointById(@PathVariable Long id) {
+        return ResponseEntity.ok(checkpointService.getCheckpointById(id));
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CheckpointResponseDTO> createCheckpoint(
