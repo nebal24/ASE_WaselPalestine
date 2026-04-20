@@ -60,27 +60,25 @@ These integrations are handled through dedicated services with caching, timeout 
 
 ---
 
-## 🏗️ System Architecture
+## 🏗️ Architecture Diagram
 
-```text
-Client Apps / Dashboard
-        ↓
- REST API Controllers
-        ↓
-   Service Layer
-        ↓
- Repository Layer
-        ↓
-   PostgreSQL DB
+The system follows a layered architecture consisting of security, controllers, services, repositories, and a PostgreSQL database.
 
-External APIs:
-- OSRM Routing API
-- OpenWeather API
-```
+External integrations are isolated in dedicated services.
 
-Full architecture details available in:
+📄 **Full architecture diagram and explanation:**  
+[View Architecture Diagram](docs/02-architecture-diagram.md)
 
-`docs/02-architecture-diagram.md`
+---
+
+## 🔌 External API Integration Details
+
+The platform integrates with external APIs to support route estimation, weather-aware mobility context, and geocoding functionality.
+
+These integrations are handled through dedicated services with caching, timeout protection, and graceful failure handling.
+
+📄 **Full external API integration details:**  
+[View External API Documentation](docs/05-external-api-integration.md)
 
 ---
 
@@ -104,6 +102,7 @@ Full architecture details available in:
 ```bash
 git clone https://github.com/nebal24/ASE_WaselPalestine.git
 cd ASE_WaselPalestine
+
 ./mvnw spring-boot:run
 ```
 
@@ -163,3 +162,4 @@ The testing process also included identifying bottlenecks, analyzing system limi
 ## © 2026 Wasel Palestine
 
 Advanced Software Engineering Course Project
+
