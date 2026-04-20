@@ -59,18 +59,26 @@ function getToken() {
         'auth login - 200': (r) => r.status === 200,
     });
 
-    return res.json('token');
+    return res.json('accessToken');
 }
 
 export function setup() {
-    const token = getToken();
-    return { token };
+    return {
+        tokens: [
+            'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInRva2VuVHlwZSI6ImFjY2VzcyIsInVzZXJJZCI6MTEsInN1YiI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNzc2NzA3NTI4LCJleHAiOjE3NzY3OTM5Mjh9.U820ajy4yIgYXY35FgzrFGxaNzFr9EbtPnk4vZCyjkM',
+            'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInRva2VuVHlwZSI6ImFjY2VzcyIsInVzZXJJZCI6Nywic3ViIjoiQWZuYW5AZ21haWwuY29tIiwiaWF0IjoxNzc2NzA3NTU0LCJleHAiOjE3NzY3OTM5NTR9.ME-wYilFrx1wl6T8-k0acBPMJcQWRVU9G1h7A7iz62E',
+            'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInRva2VuVHlwZSI6ImFjY2VzcyIsInVzZXJJZCI6MjgsInN1YiI6IlVzZXIxMUB3YXNlbC5wcyIsImlhdCI6MTc3NjcwNzYwOCwiZXhwIjoxNzc2Nzk0MDA4fQ.F0MApN-kGanaBt8ZtVAR59hfpin9790MjwfPKeriE7k'
+        ]
+    };
 }
 
-function getHeaders(token) {
+function getHeaders(data) {
+    const tokens = data.tokens;
+    const randomToken = tokens[Math.floor(Math.random() * tokens.length)];
+
     return {
         headers: {
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${randomToken}`,
             'Content-Type': 'application/json'
         }
     };
@@ -81,7 +89,7 @@ function getHeaders(token) {
 // ==========================
 
 function getAllReports(data) {
-    const res = http.get(`${BASE_URL}/api/v1/reports`, getHeaders(data.token));
+    const res = http.get(`${BASE_URL}/api/v1/reports`, getHeaders(data));
 
     check(res, {
         'reports GET all - 200': (r) => r.status === 200,
@@ -98,7 +106,7 @@ function createReport(data) {
         longitude: 35.2
     });
 
-    const res = http.post(`${BASE_URL}/api/v1/reports`, payload, getHeaders(data.token));
+    const res = http.post(`${BASE_URL}/api/v1/reports`, payload, getHeaders(data));
 
     check(res, {
         'reports POST - success': (r) => r.status === 201 || r.status === 400,
@@ -108,7 +116,7 @@ function createReport(data) {
 }
 
 function getReportById(data) {
-    const res = http.get(`${BASE_URL}/api/v1/reports/1`, getHeaders(data.token));
+    const res = http.get(`${BASE_URL}/api/v1/reports/1`, getHeaders(data));
 
     check(res, {
         'reports GET by ID - 200': (r) => r.status === 200,
@@ -118,7 +126,7 @@ function getReportById(data) {
 }
 
 function getMyAlerts(data) {
-    const res = http.get(`${BASE_URL}/api/v1/alerts/me`, getHeaders(data.token));
+    const res = http.get(`${BASE_URL}/api/v1/alerts/me`, getHeaders(data));
 
     check(res, {
         'alerts GET my alerts - 200': (r) => r.status === 200,
