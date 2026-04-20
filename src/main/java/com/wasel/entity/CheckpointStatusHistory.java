@@ -8,7 +8,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "checkpoint_status_history")
+@Table(
+    name = "checkpoint_status_history",
+    indexes = {
+        @Index(name = "idx_csh_checkpoint_updated", columnList = "checkpoint_id, updatedAt")
+    }
+)
 @Data
 public class CheckpointStatusHistory {
 

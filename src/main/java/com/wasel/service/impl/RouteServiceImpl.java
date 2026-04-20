@@ -11,6 +11,7 @@ import com.wasel.service.RouteService;
 import com.wasel.util.HaversineCalculator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class RouteServiceImpl implements RouteService {
     private static final double AREA_RADIUS_KM = 5.0;
 
     @Override
+    @Cacheable(value = "routes", key = "#request.originLat + ',' + #request.originLon + ',' + #request.destinationLat + ',' + #request.destinationLon + ',' + #request.avoidCheckpoints + ',' + #request.avoidAreas", sync = true)
     public RouteResponseDTO estimateRoute(RouteRequestDTO request) {
         List<String> factors = new ArrayList<>();
         boolean routeModified = false;

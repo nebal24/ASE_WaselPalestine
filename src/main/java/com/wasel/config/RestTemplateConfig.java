@@ -29,8 +29,8 @@ public class RestTemplateConfig {
     @ConditionalOnMissingBean(RestTemplate.class)
     public RestTemplate restTemplate() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(10000);
-        factory.setReadTimeout(15000);
+        factory.setConnectTimeout(5000);
+        factory.setReadTimeout(8000);
 
         RestTemplate restTemplate = new RestTemplate(factory);
 
