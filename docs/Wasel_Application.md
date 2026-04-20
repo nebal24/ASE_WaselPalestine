@@ -233,6 +233,7 @@ Authentication: Requires a valid JWT Bearer token.
 }
 ```
 
+
 ### Responses
 
 |HTTP Status Code |Meaning|Description|Data schema|
