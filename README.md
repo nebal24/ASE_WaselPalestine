@@ -18,14 +18,14 @@ It is built as a **backend-only RESTful API system** that can be consumed by mob
 
 ## ✨ Core Features
 
-| Feature               | Description                                                                 |
-| --------------------- | --------------------------------------------------------------------------- |
-| 🚧 Road Incidents     | Create, update, verify, close incidents with filtering, sorting, pagination |
-| 🚏 Checkpoints        | Centralized registry with status history tracking                           |
-| 🗺️ Route Estimation  | Calculate estimated distance & duration using OpenStreetMap (OSRM)          |
-| 🌦️ Weather Data      | Real-time weather data by coordinates with caching                          |
-| 🔐 JWT Authentication | Secure login with role-based access                                         |
-| 📢 Alerts System      | Users subscribe to incident notifications by area/category                  |
+| Feature               | Description                                                                     |
+| --------------------- | ------------------------------------------------------------------------------- |
+| 🚧 Road Incidents     | Create, update, verify, close incidents with filtering, sorting, and pagination |
+| 🚏 Checkpoints        | Centralized registry with status history tracking                               |
+| 🗺️ Route Estimation  | Calculate estimated distance and duration using OpenStreetMap (OSRM)            |
+| 🌦️ Weather Data      | Real-time weather data by coordinates with caching                              |
+| 🔐 JWT Authentication | Secure login with role-based access                                             |
+| 📢 Alerts System      | Users subscribe to incident notifications by area/category                      |
 
 ---
 
@@ -44,15 +44,13 @@ It is built as a **backend-only RESTful API system** that can be consumed by mob
 
 ---
 
----
-
 ## 🏗️ Architecture Diagram
 
 The system follows a layered architecture consisting of security, controllers, services, repositories, and a PostgreSQL database.
 
 External integrations are isolated in dedicated services.
 
-📄 **Full architecture diagram and explanation:**  
+📄 **Full architecture diagram and explanation:**
 [View Architecture Diagram](docs/02-architecture-diagram.md)
 
 ---
@@ -63,14 +61,36 @@ The platform integrates with external APIs to support route estimation, weather-
 
 These integrations are handled through dedicated services with caching, timeout protection, and graceful failure handling.
 
-📄 **Full external API integration details:**  
+📄 **Full external API integration details:**
 [View External API Documentation](docs/05-external-api-integration.md)
+
+---
+
+## 🧩 API Design Rationale
+
+The Wasel Palestine API was designed using RESTful principles with versioned endpoints, JWT authentication, role-based access control, and standardized HTTP responses to ensure scalability, maintainability, and secure integration.
+
+📄 **Full API design explanation:**
+[View API Design Rationale](docs/04-api-design.md)
+
+---
+
+## ⚡ Performance Testing Results
+
+Performance and load testing were conducted using k6 to evaluate system behavior under read-heavy, write-heavy, mixed, spike, and soak workloads.
+
+The tests measured response time, p95 latency, throughput, and error rate, with optimization improvements applied after analysis.
+
+📄 **Full performance testing report:**
+[View Performance Testing Results](docs/07-performance-results.md)
 
 ---
 
 ## 🌐 API Base URL
 
-`http://localhost:8080/api/v1`
+```text id="cnl8zr"
+http://localhost:8081/api/v1
+```
 
 ---
 
@@ -85,7 +105,8 @@ These integrations are handled through dedicated services with caching, timeout 
 
 ### Installation
 
-```bash
+```bash id="4n5o4h"
 git clone https://github.com/nebal24/ASE_WaselPalestine.git
 cd ASE_WaselPalestine
 ./mvnw spring-boot:run
+```
