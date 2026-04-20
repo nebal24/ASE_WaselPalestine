@@ -1,20 +1,14 @@
 # 🚗 Wasel Palestine - Smart Mobility Platform
 
-## 📌 Project Overview
+## System Overview
 
-Wasel Palestine is an API-centric smart mobility platform designed to help Palestinians navigate daily movement challenges through real-time mobility intelligence.
+Wasel Palestine is a backend-centric smart mobility platform designed to help Palestinians navigate daily movement challenges through structured, reliable, and up-to-date mobility intelligence. The system exposes its functionality through versioned RESTful APIs that support client applications such as mobile apps, web dashboards, and third-party systems.
 
-The platform provides structured and reliable data about:
+The platform manages mobility-related data including road incidents, checkpoints, traffic disruptions, route estimation, weather context, and regional alerts. It also supports crowdsourced reporting, moderation workflows, credibility indicators, and external API integration for routing/geolocation and contextual environmental data.
 
-* Road conditions
-* Checkpoints
-* Traffic incidents
-* Weather conditions
-* Route estimation
+This project focuses on backend software engineering concerns, including API design, data modeling, database interaction, authentication and authorization, external service integration, performance evaluation, and system reliability. A more detailed explanation of the system scope, components, and responsibilities is provided in the full System Overview document.
 
-It is built as a **backend-only RESTful API system** that can be consumed by mobile apps, dashboards, or third-party systems.
-
----
+**Detailed document:** `docs/system-overview.md`
 
 ## ✨ Core Features
 
@@ -94,7 +88,17 @@ cd ASE_WaselPalestine
 ```
 
 ---
+## Testing Strategy
 
+The system was tested using a combination of functional API testing and performance/load testing to ensure correctness, reliability, and scalability.
+
+Functional testing was conducted using API-Dog, where all endpoints were validated, including authentication flows, request/response structures, and error handling scenarios.
+
+Performance and load testing were performed using k6. Multiple scenarios were evaluated, including read-heavy workloads (incident retrieval), write-heavy workloads (report submissions), mixed workloads, spike testing, and sustained load testing. Key performance metrics such as average response time, p95 latency, throughput, and error rate were collected and analyzed.
+
+The testing process also included identifying bottlenecks, analyzing system limitations, and applying optimizations, followed by before-and-after performance comparisons.
+
+**Detailed report:** `docs/testing-strategy.md`
 ## 📊 Test Results
 
 ### API Testing (API-Dog)
