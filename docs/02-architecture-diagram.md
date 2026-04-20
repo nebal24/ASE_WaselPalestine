@@ -1,41 +1,55 @@
-Client Applications (Postman / Mobile App / Dashboard)
-                         ↓ HTTP Requests
+## Architecture Diagram
 
-                [Security Layer]
-     JwtAuthenticationFilter  →  JwtService
-                        ↓
+```mermaid
+flowchart TD
 
-             [REST Controllers Layer]
-AuthenticationController | AdminController
-CheckpointController | IncidentController | ReportController
-RouteController | AlertController | AlertSubscriptionController
-ModerationController | ModerationHistoryController | VoteController
+    A[Client (Postman / Mobile App / Dashboard)] --> B[Security Filter Layer]
+    B --> C[Controllers Layer]
+    C --> D[Service Layer]
+    D --> E[Repository Layer]
+    E --> F[(PostgreSQL Database)]
 
-                        ↓
+    %% Security
+    B --> B1[JwtAuthenticationFilter]
+    B1 --> B2[JwtService]
 
-                 [Service Layer]
-AuthenticationService | AdminService
-CheckpointService | IncidentService | ReportService
-RouteService | RouteMetadataService | WeatherService | GeocodingService
-AlertService | AlertSubscriptionService
-ModerationService | ModerationHistoryService | ModerationAuditService
-VoteService | NotificationService
+    %% Controllers
+    C --> C1[AuthenticationController]
+    C --> C2[CheckpointController]
+    C --> C3[IncidentController]
+    C --> C4[ReportController]
+    C --> C5[RouteController]
+    C --> C6[AlertController]
+    C --> C7[AlertSubscriptionController]
+    C --> C8[VoteController]
+    C --> C9[ModerationController]
+    C --> C10[ModerationHistoryController]
+    C --> C11[AdminController]
 
-                        ↓
+    %% Services
+    D --> D1[CheckpointService]
+    D --> D2[IncidentService]
+    D --> D3[ReportService]
+    D --> D4[RouteService]
+    D --> D5[WeatherService]
+    D --> D6[AlertService]
+    D --> D7[ModerationService]
+    D --> D8[VoteService]
+    D --> D9[AdminService]
+    D --> D10[AlertSubscriptionService]
+    D --> D11[GeocodingService]
 
-             [Repository Layer - JPA]
-UserRepository | CheckpointRepository | CheckpointStatusHistoryRepository
-IncidentRepository | ReportRepository | VoteRepository
-ModerationActionRepository | AlertRepository | AlertSubscriptionRepository
+    %% Repositories
+    E --> E1[UserRepository]
+    E --> E2[CheckpointRepository]
+    E --> E3[IncidentRepository]
+    E --> E4[ReportRepository]
+    E --> E5[VoteRepository]
+    E --> E6[AlertRepository]
+    E --> E7[ModerationActionRepository]
+    E --> E8[AlertSubscriptionRepository]
 
-                        ↓
-
-                [PostgreSQL Database]
-Tables: users, checkpoints, checkpoint_status_history,
-incidents, reports, votes, moderation_actions,
-alerts, alert_subscriptions
-
-External APIs:
-RouteService / OpenStreetMapClient ──→ OSRM API
-WeatherService ─────────────────────→ OpenWeatherMap API
-GeocodingService ───────────────────→ Nominatim API
+    %% External APIs
+    D4 --> X1[OSRM API]
+    D5 --> X2[OpenWeatherMap API]
+    D11 --> X3[Nominatim API]
