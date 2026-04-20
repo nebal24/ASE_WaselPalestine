@@ -1,41 +1,73 @@
-Client Applications (Postman / Mobile App / Dashboard)
-                         ↓ HTTP Requests
+# Architecture Diagram
+```
+┌──────────────────────────────────────────────────────────────────┐
+│           Client (Postman / Mobile App / Dashboard)              │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │  HTTP Requests
+                               ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                      Security Filter Layer                       │
+│           JwtAuthenticationFilter  ←→  JwtService                │
+│(validates protected requests before reaching secured controllers)│
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                       Controllers Layer                          │
+│                                                                  │
+│   AuthenticationController      CheckpointController             │
+│   IncidentController            ReportController                 │
+│   RouteController               AlertController                  │
+│   AlertSubscriptionController   VoteController                   │
+│   ModerationController          ModerationHistoryController      │
+│   AdminController                                                │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                        Service Layer                             │
+│                                                                  │
+│   CheckpointService     IncidentService      ReportService       │
+│   RouteService          WeatherService       AlertService        │
+│   ModerationService     VoteService          AdminService        │
+│   AlertSubscriptionService                  GeocodingService     │
+└──────────────┬────────────────────────────────┬──────────────────┘
+               │                                │
+               ▼                                ▼
+┌──────────────────────────────┐  ┌─────────────────────────────────┐
+│       Repository Layer       │  │         External APIs           │
+│      (Spring Data JPA)       │  │                                 │
+│                              │  │  OSRM Routing API               │
+│  UserRepository              │  │  (router.project-osrm.org)      │
+│  CheckpointRepository        │  │  ↑ called by RouteService       │
+│  IncidentRepository          │  │                                 │
+│  ReportRepository            │  │  OpenWeatherMap API             │
+│  VoteRepository              │  │  (api.openweathermap.org)       │
+│  AlertRepository             │  │  ↑ called by WeatherService     │
+│  ModerationActionRepository  │  │  ↑ cached 10 min per location   │
+│  AlertSubscriptionRepository │  │                                 │
+│  CheckpointStatusHistory     │  │  Nominatim API                  │
+│  Repository                  │  │  (nominatim.openstreetmap.org)  │
+│                              │  │  ↑ called by GeocodingService   │
+└──────────────┬───────────────┘  └─────────────────────────────────┘
+               │
+               ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                      PostgreSQL Database                         │
+│                                                                  │
+│   users                checkpoints        checkpoint_status_     │
+│   incidents            reports            history                │
+│   votes                moderation_actions alert_subscriptions    │
+│   alerts                                                         │
+└──────────────────────────────────────────────────────────────────┘
+```
+## Explanation
 
-                [Security Layer]
-     JwtAuthenticationFilter  →  JwtService
-                        ↓
+The system follows a layered architecture to separate responsibilities and improve maintainability.
 
-             [REST Controllers Layer]
-AuthenticationController | AdminController
-CheckpointController | IncidentController | ReportController
-RouteController | AlertController | AlertSubscriptionController
-ModerationController | ModerationHistoryController | VoteController
-
-                        ↓
-
-                 [Service Layer]
-AuthenticationService | AdminService
-CheckpointService | IncidentService | ReportService
-RouteService | RouteMetadataService | WeatherService | GeocodingService
-AlertService | AlertSubscriptionService
-ModerationService | ModerationHistoryService | ModerationAuditService
-VoteService | NotificationService
-
-                        ↓
-
-             [Repository Layer - JPA]
-UserRepository | CheckpointRepository | CheckpointStatusHistoryRepository
-IncidentRepository | ReportRepository | VoteRepository
-ModerationActionRepository | AlertRepository | AlertSubscriptionRepository
-
-                        ↓
-
-                [PostgreSQL Database]
-Tables: users, checkpoints, checkpoint_status_history,
-incidents, reports, votes, moderation_actions,
-alerts, alert_subscriptions
-
-External APIs:
-RouteService / OpenStreetMapClient ──→ OSRM API
-WeatherService ─────────────────────→ OpenWeatherMap API
-GeocodingService ───────────────────→ Nominatim API
+- The client layer includes API consumers such as Postman, dashboards, or mobile applications.
+- Protected requests pass through the JWT security filter before reaching secured controllers.
+- The controllers expose REST endpoints and delegate business logic to the service layer.
+- The service layer contains the core application logic and communicates with both repositories and external APIs.
+- The repository layer uses Spring Data JPA to access the PostgreSQL database.
+- External API integrations are isolated in dedicated services to keep third-party logic separate from the core backend system.

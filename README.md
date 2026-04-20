@@ -38,6 +38,26 @@ This project focuses on backend software engineering concerns, including API des
 
 ---
 
+## 🏗️ Architecture Diagram
+
+The system follows a layered architecture consisting of security, controllers, services, repositories, and a PostgreSQL database.
+
+External integrations are isolated in dedicated services.
+
+📄 **Full architecture diagram and explanation:**
+[View Architecture Diagram](docs/02-architecture-diagram.md)
+
+---
+
+## 🔌 External API Integration Details
+
+The platform integrates with external APIs to support route estimation, weather-aware mobility context, and geocoding functionality.
+
+These integrations are handled through dedicated services with caching, timeout protection, and graceful failure handling.
+
+📄 **Full external API integration details:**
+[View External API Documentation](docs/05-external-api-integration.md)
+
 ---
 
 ## 🏗️ System Architecture
