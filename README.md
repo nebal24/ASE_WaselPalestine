@@ -47,16 +47,25 @@ It is built as a **backend-only RESTful API system** that can be consumed by mob
 ---
 
 ## 🏗️ Architecture Diagram
+
 The system follows a layered architecture consisting of security, controllers, services, repositories, and a PostgreSQL database.
+
 External integrations are isolated in dedicated services.
-📄 Full architecture diagram and explanation: [View Architecture Diagram](docs/02-architecture-diagram.md)
+
+📄 **Full architecture diagram and explanation:**  
+[View Architecture Diagram](docs/02-architecture-diagram.md)
 
 ---
+
 ## 🔌 External API Integration Details
+
 The platform integrates with external APIs to support route estimation, weather-aware mobility context, and geocoding functionality.
+
 These integrations are handled through dedicated services with caching, timeout protection, and graceful failure handling.
 
-📄 Full external API integration details: [View External API Documentation](docs/05-external-api-integration.md)
+📄 **Full external API integration details:**  
+[View External API Documentation](docs/05-external-api-integration.md)
+
 ---
 
 ## 🌐 API Base URL
@@ -80,51 +89,3 @@ These integrations are handled through dedicated services with caching, timeout 
 git clone https://github.com/nebal24/ASE_WaselPalestine.git
 cd ASE_WaselPalestine
 ./mvnw spring-boot:run
-```
-
----
-
-## 📊 Test Results
-
-### API Testing (API-Dog)
-
-* Total Tests: 33
-* Passed: 33
-* Failed: 0
-
-### Performance Testing (k6)
-
-| Scenario    | VUs | Avg Response | p95   | Error Rate |
-| ----------- | --- | ------------ | ----- | ---------- |
-| Read-Heavy  | 10  | 331ms        | 3.03s | 0%         |
-| Write-Heavy | 10  | 451ms        | 4.34s | 0%         |
-| Mixed       | 20  | 322ms        | 3.02s | 0%         |
-| Spike       | 200 | 317ms        | 3.01s | 0%         |
-| Soak        | 20  | 14ms         | 31ms  | 0%         |
-
----
-
-## 🔐 Security Features
-
-* JWT Access + Refresh Tokens
-* Password Encryption
-* Role-Based Authorization
-* Input Validation
-* Protected Admin / Moderator Routes
-
----
-
-## 👥 Team Members
-
-| Name  |
-| ----- |
-| Amaal |
-| Nebal |
-| Afnan |
-| Sana  |
-
----
-
-## © 2026 Wasel Palestine
-
-Advanced Software Engineering Course Project
