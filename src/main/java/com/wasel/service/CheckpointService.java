@@ -1,14 +1,16 @@
 package com.wasel.service;
 
+import com.wasel.dto.CheckpointRequestDTO;
+import com.wasel.dto.CheckpointResponseDTO;
+import com.wasel.dto.CheckpointStatusHistoryDTO;
+import com.wasel.dto.TopViolatedCheckpointDTO;
 import com.wasel.entity.Checkpoint;
 import com.wasel.entity.CheckpointStatusHistory;
-import com.wasel.entity.Incident;
 import com.wasel.entity.User;
+import com.wasel.exception.ResourceNotFoundException;
 import com.wasel.model.CheckpointStatus;
-import com.wasel.model.IncidentStatus;
 import com.wasel.repository.CheckpointRepository;
 import com.wasel.repository.CheckpointStatusHistoryRepository;
-import com.wasel.repository.IncidentRepository;
 import com.wasel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,32 +26,59 @@ public class CheckpointService {
     private final CheckpointRepository checkpointRepository;
     private final CheckpointStatusHistoryRepository historyRepository;
     private final UserRepository userRepository;
-    private final IncidentRepository incidentRepository;
 
-    @Transactional
-    public Checkpoint createCheckpoint(Checkpoint checkpoint, Long createdByUserId) {
-        User user = userRepository.findById(createdByUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    @Transactional(readOnly = true)
+    public List<CheckpointResponseDTO> getAllCheckpoints() {
+        return checkpointRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
 
-        checkpoint.setCurrentStatus(CheckpointStatus.OPEN);
-        Checkpoint saved = checkpointRepository.saveAndFlush(checkpoint);
-        saveStatusHistory(saved, CheckpointStatus.OPEN, user);
-        return saved;
+    @Transactional(readOnly = true)
+    public CheckpointResponseDTO getCheckpointById(Long id) {
+        return checkpointRepository.findById(id)
+                .map(this::toDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Checkpoint not found with id: " + id));
     }
 
     @Transactional
-    public Checkpoint updateStatus(Long checkpointId, CheckpointStatus newStatus, Long updatedByUserId) {
+    public CheckpointResponseDTO createCheckpoint(CheckpointRequestDTO request, Long createdByUserId) {
+        User user = userRepository.findById(createdByUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Checkpoint checkpoint = new Checkpoint();
+        checkpoint.setName(request.getName());
+        checkpoint.setLatitude(request.getLatitude());
+        checkpoint.setLongitude(request.getLongitude());
+        checkpoint.setDescription(request.getDescription());
+        checkpoint.setCurrentStatus(CheckpointStatus.OPEN);
+
+        Checkpoint saved = checkpointRepository.saveAndFlush(checkpoint);
+        saveStatusHistory(saved, CheckpointStatus.OPEN, user);
+        return toDTO(saved);
+    }
+
+    @Transactional
+    public CheckpointResponseDTO updateStatus(Long checkpointId, CheckpointStatus newStatus, Long updatedByUserId) {
         Checkpoint cp = checkpointRepository.findById(checkpointId)
-                .orElseThrow(() -> new RuntimeException("Checkpoint not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Checkpoint not found"));
 
         User user = userRepository.findById(updatedByUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         cp.setCurrentStatus(newStatus);
         Checkpoint saved = checkpointRepository.save(cp);
-
         saveStatusHistory(saved, newStatus, user);
-        return saved;
+        return toDTO(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CheckpointStatusHistoryDTO> getStatusHistory(Long checkpointId) {
+        return historyRepository.findByCheckpointIdOrderByUpdatedAtDesc(checkpointId)
+                .stream()
+                .map(this::toHistoryDTO)
+                .toList();
     }
 
     private void saveStatusHistory(Checkpoint checkpoint, CheckpointStatus status, User user) {
@@ -61,24 +90,38 @@ public class CheckpointService {
         historyRepository.save(history);
     }
 
+    /** Query 1 — maps each Object[] row to a typed DTO. */
     @Transactional(readOnly = true)
-    public List<CheckpointStatusHistory> getStatusHistory(Long checkpointId) {
-        return historyRepository.findByCheckpointIdOrderByUpdatedAtDesc(checkpointId);
+    public List<TopViolatedCheckpointDTO> getTopViolatedCheckpoints() {
+        return checkpointRepository.findTopViolatedCheckpoints()
+                .stream()
+                .map(row -> TopViolatedCheckpointDTO.builder()
+                        .checkpointId(((Number) row[0]).longValue())
+                        .checkpointName((String) row[1])
+                        .incidentCount(((Number) row[2]).longValue())
+                        .averageSeverity(row[3] != null ? ((Number) row[3]).doubleValue() : null)
+                        .build())
+                .toList();
     }
 
-    @Transactional
-    public Incident createIncidentForCheckpoint(Long checkpointId, Incident incident, Long createdByUserId) {
-        Checkpoint cp = checkpointRepository.findById(checkpointId)
-                .orElseThrow(() -> new RuntimeException("Checkpoint not found"));
+    private CheckpointResponseDTO toDTO(Checkpoint cp) {
+        return CheckpointResponseDTO.builder()
+                .id(cp.getId())
+                .name(cp.getName())
+                .latitude(cp.getLatitude())
+                .longitude(cp.getLongitude())
+                .currentStatus(cp.getCurrentStatus() != null ? cp.getCurrentStatus().name() : null)
+                .description(cp.getDescription())
+                .build();
+    }
 
-        User user = userRepository.findById(createdByUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        incident.setCheckpoint(cp);
-        incident.setCreatedBy(user);
-        incident.setCreatedAt(LocalDateTime.now());
-        incident.setStatus(IncidentStatus.OPEN);
-
-        return incidentRepository.save(incident);
+    private CheckpointStatusHistoryDTO toHistoryDTO(CheckpointStatusHistory h) {
+        return CheckpointStatusHistoryDTO.builder()
+                .statusId(h.getStatusId())
+                .status(h.getStatus() != null ? h.getStatus().name() : null)
+                .updatedAt(h.getUpdatedAt())
+                .updatedById(h.getUpdatedBy() != null ? h.getUpdatedBy().getId() : null)
+                .updatedByName(h.getUpdatedBy() != null ? h.getUpdatedBy().getName() : null)
+                .build();
     }
 }

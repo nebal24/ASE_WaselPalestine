@@ -1,7 +1,8 @@
 package com.wasel.controller;
 
-import com.wasel.entity.Checkpoint;
-import com.wasel.entity.CheckpointStatusHistory;
+import com.wasel.dto.CheckpointRequestDTO;
+import com.wasel.dto.CheckpointResponseDTO;
+import com.wasel.dto.CheckpointStatusHistoryDTO;
 import com.wasel.entity.User;
 import com.wasel.model.CheckpointStatus;
 import com.wasel.service.CheckpointService;
@@ -12,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.List;
 
 @RestController
@@ -22,26 +22,36 @@ public class CheckpointController {
 
     private final CheckpointService checkpointService;
 
+    @GetMapping
+    public ResponseEntity<List<CheckpointResponseDTO>> getAllCheckpoints() {
+        return ResponseEntity.ok(checkpointService.getAllCheckpoints());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CheckpointResponseDTO> getCheckpointById(@PathVariable Long id) {
+        return ResponseEntity.ok(checkpointService.getCheckpointById(id));
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Checkpoint> createCheckpoint(
-            @RequestBody Checkpoint checkpoint,
-            @AuthenticationPrincipal User user) {   // ← هاد الصح
+    public ResponseEntity<CheckpointResponseDTO> createCheckpoint(
+            @RequestBody CheckpointRequestDTO request,
+            @AuthenticationPrincipal User user) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(checkpointService.createCheckpoint(checkpoint, user.getId()));
+                .body(checkpointService.createCheckpoint(request, user.getId()));
     }
 
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<Checkpoint> updateStatus(
+    public ResponseEntity<CheckpointResponseDTO> updateStatus(
             @PathVariable Long id,
             @RequestParam CheckpointStatus status,
-            @RequestAttribute Long userId) {
-        return ResponseEntity.ok(checkpointService.updateStatus(id, status, userId));
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(checkpointService.updateStatus(id, status, user.getId()));
     }
 
     @GetMapping("/{id}/history")
-    public ResponseEntity<List<CheckpointStatusHistory>> getHistory(@PathVariable Long id) {
+    public ResponseEntity<List<CheckpointStatusHistoryDTO>> getHistory(@PathVariable Long id) {
         return ResponseEntity.ok(checkpointService.getStatusHistory(id));
     }
 }

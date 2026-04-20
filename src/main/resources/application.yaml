@@ -14,7 +14,10 @@ spring:
 server:
   port: 8081
 
+jwt:
+  secret-key: ${JWT_SECRET_KEY:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+
 weather:
   api:
-    key: 75a837afaa2618e2c287649a5553ba7d
+    key: ${WEATHER_API_KEY:75a837afaa2618e2c287649a5553ba7d}
     url: https://api.openweathermap.org/data/2.5/weather

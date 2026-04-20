@@ -1,0 +1,61 @@
+services:
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: wasel-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: wasel
+      POSTGRES_USER: wasel_user
+      POSTGRES_PASSWORD: wasel_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wasel_user -d wasel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Spring Boot Application ──────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wasel-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8081
+
+      # Point to the postgres service by its service name, not localhost
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wasel
+      SPRING_DATASOURCE_USERNAME: wasel_user
+      SPRING_DATASOURCE_PASSWORD: wasel_pass
+
+      # Let Hibernate manage the schema on startup
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      # Reduce noise in production logs
+      SPRING_JPA_SHOW_SQL: "false"
+
+      # Secrets — override these in production (e.g. via .env file or secret manager)
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      WEATHER_API_KEY: ${WEATHER_API_KEY:-75a837afaa2618e2c287649a5553ba7d}
+
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/api/v1/incidents > /dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  postgres_data:

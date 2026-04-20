@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/routes")
 @RequiredArgsConstructor
@@ -20,7 +22,8 @@ public class RouteController {
             @RequestParam Double originLon,
             @RequestParam Double destinationLat,
             @RequestParam Double destinationLon,
-            @RequestParam(defaultValue = "false") boolean avoidCheckpoints) {
+            @RequestParam(defaultValue = "false") boolean avoidCheckpoints,
+            @RequestParam(required = false) List<String> avoidAreas) {
 
         RouteRequestDTO request = new RouteRequestDTO();
         request.setOriginLat(originLat);
@@ -28,8 +31,8 @@ public class RouteController {
         request.setDestinationLat(destinationLat);
         request.setDestinationLon(destinationLon);
         request.setAvoidCheckpoints(avoidCheckpoints);
+        request.setAvoidAreas(avoidAreas);
 
-        RouteResponseDTO response = routeService.estimateRoute(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(routeService.estimateRoute(request));
     }
 }

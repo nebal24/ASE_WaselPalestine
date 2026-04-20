@@ -3,8 +3,10 @@ package com.wasel.exception;
 import com.wasel.dto.ReportResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,9 +46,30 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<?> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(
+                Map.of(
+                        "timestamp", LocalDateTime.now().toString(),
+                        "error", "METHOD_NOT_ALLOWED",
+                        "message", ex.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<?> handleNoResourceFound(NoResourceFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Map.of(
+                        "timestamp", LocalDateTime.now().toString(),
+                        "error", "NOT_FOUND",
+                        "message", ex.getMessage()
+                )
+        );
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGeneral(Exception ex)
-    {
+    public ResponseEntity<?> handleGeneral(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 Map.of(
                         "timestamp", LocalDateTime.now().toString(),
