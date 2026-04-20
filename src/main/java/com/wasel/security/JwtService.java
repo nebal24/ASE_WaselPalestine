@@ -20,8 +20,8 @@ public class JwtService {
     @Value("${jwt.secret-key}")
     private String SECRET_KEY;
 
-    // Access token: 15 minutes
-    private static final long ACCESS_TOKEN_EXPIRY_MS = 1000L * 60 * 15;
+    // Access token: 1 day  
+    private static final long ACCESS_TOKEN_EXPIRY_MS = 1000L * 60 * 60 * 24;
     // Refresh token: 7 days
     private static final long REFRESH_TOKEN_EXPIRY_MS = 1000L * 60 * 60 * 24 * 7;
 

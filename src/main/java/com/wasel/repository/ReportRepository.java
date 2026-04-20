@@ -81,7 +81,7 @@ public interface ReportRepository extends JpaRepository<Report, Long>
             WHERE r.category = :category
               AND r.timestamp >= NOW() - (:withinMinutes * INTERVAL '1 minute')
               AND (
-                    -- Haversine formula: straight-line distance on Earth's surface
+                   
                     6371.0 * acos(
                         LEAST(1.0,
                             cos(radians(:latitude))  * cos(radians(r.latitude))
