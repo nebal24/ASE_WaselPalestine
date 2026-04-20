@@ -46,28 +46,17 @@ It is built as a **backend-only RESTful API system** that can be consumed by mob
 
 ---
 
-## 🏗️ System Architecture
+## 🏗️ Architecture Diagram
+The system follows a layered architecture consisting of security, controllers, services, repositories, and a PostgreSQL database.
+External integrations are isolated in dedicated services.
+📄 Full architecture diagram and explanation: [View Architecture Diagram](docs/02-architecture-diagram.md)
 
-```text
-Client Apps / Dashboard
-        ↓
- REST API Controllers
-        ↓
-   Service Layer
-        ↓
- Repository Layer
-        ↓
-   PostgreSQL DB
+---
+## 🔌 External API Integration Details
+The platform integrates with external APIs to support route estimation, weather-aware mobility context, and geocoding functionality.
+These integrations are handled through dedicated services with caching, timeout protection, and graceful failure handling.
 
-External APIs:
-- OSRM Routing API
-- OpenWeather API
-```
-
-Full architecture details available in:
-
-`docs/02-architecture-diagram.md`
-
+📄 Full external API integration details: [View External API Documentation](docs/05-external-api-integration.md)
 ---
 
 ## 🌐 API Base URL
