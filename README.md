@@ -1,4 +1,5 @@
 # 🚗 Wasel Palestine - Smart Mobility Platform
+![Technology Stack](/assets/WaselPalestine.png)
 
 **Backend RESTful API Platform for Smart Mobility and Checkpoint Intelligence in Palestine**
 
