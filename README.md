@@ -64,8 +64,7 @@ The system is composed of:
 
 External integrations are isolated in dedicated services to improve reliability and maintainability.
 
-📄 **Full architecture diagram and explanation:**  
-[View Architecture Diagram](docs/02-architecture-diagram.md)
+📄 **Full architecture diagram and explanation:**[View Architecture Diagram](docs/02-architecture-diagram.md)
 
 ---
 ## 🗄️ Database Schema (ERD)
@@ -74,8 +73,7 @@ The database schema is designed using PostgreSQL and represents the main relatio
 
 It uses primary keys, foreign keys, and unique constraints to maintain data consistency and support the main backend features.
 
-📄 **Full ERD and database explanation:**  
-[View Database Schema ERD](docs/03-database-schema-erd.md)
+📄 **Full ERD and database explanation:**[View Database Schema ERD](docs/03-database-schema-erd.md)
 ---
 
 
@@ -87,8 +85,7 @@ The API uses versioned endpoints (`/api/v1/`), standard HTTP methods, JWT authen
 
 Additional features such as filtering, sorting, pagination, and standardized error handling were implemented to improve usability, performance, and long-term maintainability.
 
-📄 **Full API design explanation:**  
-[View API Design Rationale](docs/04-api-design.md)
+📄 **Full API design explanation:**[View API Design Rationale](docs/04-api-design.md)
 
 ---
 
@@ -98,8 +95,7 @@ The platform integrates with external APIs to support route estimation, weather-
 
 These integrations are handled through dedicated services with caching, timeout protection, and graceful failure handling.
 
-📄 **Full external API integration details:**
-[View External API Documentation](docs/05-external-api-integration.md)
+📄 **Full external API integration details:**[View External API Documentation](docs/05-external-api-integration.md)
 
 ---
 
@@ -111,8 +107,7 @@ API-Dog was used to document and manually test endpoints, while k6 was used to e
 
 The strategy covers authentication testing, CRUD operations, validation errors, role-based access control, external API behavior, and load testing results.
 
-📄 **Full testing strategy:**  
-[View Testing Strategy](docs/testing-strategy.md)
+📄 **Full testing strategy:**[View Testing Strategy](docs/testing-strategy.md)
 
 ---
 ## 📈 Performance Testing Results
@@ -123,11 +118,16 @@ Metrics such as average response time, p95 latency, throughput, and error rate w
 
 The results were used to improve caching behavior, database efficiency, and overall API responsiveness.
 
-📄 **Full performance report:**  
-[View Performance Testing Results](docs/07-performance-testing-results.md)
+📄 **Full performance report:**[View Performance Testing Results](docs/07-performance-results.md)
 
 
 ---
+## 📘 API-Dog Collection Export
+
+[View API-Dog Export](docs/Wasel_Application.md)
+
+---
+
 
 ## 🚀 Installation & Running
 
@@ -141,9 +141,7 @@ Or run manually using Maven:
 
 - mvn spring-boot:run
 
-The server will run on:
-
-http://localhost:8081
+The server will run on:http://localhost:8081
 
 ---
 
