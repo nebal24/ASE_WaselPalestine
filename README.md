@@ -49,6 +49,16 @@ A more detailed explanation of the system scope, components, and responsibilitie
 | Deployment | Docker |
 
 ---
+## ✅ Technology Stack Justification
+
+Spring Boot with Java 21 was selected as the backend technology because it supports building secure, scalable, and maintainable RESTful APIs.
+
+The detailed justification explains the choice in terms of scalability, security, maintainability, and development efficiency.
+
+📄 **Full technology stack justification:**  
+[View Technology Stack Justification](docs/technology-stack-justification.md)
+
+---
 
 ## 🏗️ Architecture Diagram
 
