@@ -11,6 +11,7 @@ The schema is structured to ensure data consistency, maintainability, and scalab
 ## ERD Diagram
 
 ![Database ERD](../assets/erd.png)
+<img width="1741" height="875" alt="image" src="https://github.com/user-attachments/assets/a465daa6-8b9c-4cb5-a9a5-d745bb9727a0" />
 
 ---
 
