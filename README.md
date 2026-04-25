@@ -30,6 +30,7 @@ A more detailed explanation of the system scope, components, and responsibilitie
 | 🗺️ Route Estimation & Mobility Intelligence | Estimates routes between two locations and returns the expected distance, duration, and metadata explaining factors that may affect the route, such as checkpoints, incidents, or avoided areas. |
 | 📢 Alerts & Regional Notifications | Enables users to subscribe to alerts based on geographic areas or incident categories. When new verified incidents are added, alert records are generated to support future notification services. |
 ---
+
 ## 🛠️ Tech Stack
 
 | Component | Technology |
