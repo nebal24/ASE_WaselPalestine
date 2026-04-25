@@ -61,6 +61,8 @@
 │   alerts                                                         │
 └──────────────────────────────────────────────────────────────────┘
 ```
+<img width="1446" height="823" alt="image" src="https://github.com/user-attachments/assets/a4f7ac23-3dd5-4847-a15f-d1f3b26fac23" />
+
 ## Explanation
 
 The system follows a layered architecture to separate responsibilities and improve maintainability.
