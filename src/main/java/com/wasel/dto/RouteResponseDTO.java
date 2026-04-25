@@ -21,6 +21,7 @@ public class RouteResponseDTO {
     // Metadata explaining factors that affect this route
     private RouteMetadata metadata;
 
+
     @Data
     @Builder
     public static class RouteMetadata {

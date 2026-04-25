@@ -36,6 +36,7 @@ public class HaversineCalculator {
         return EARTH_RADIUS_KM * c;
     }
 
+
     /**
      * Estimate travel time based on distance and average speed
      *

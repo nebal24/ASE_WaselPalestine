@@ -25,6 +25,7 @@ public class RouteController {
             @RequestParam(defaultValue = "false") boolean avoidCheckpoints,
             @RequestParam(required = false) List<String> avoidAreas) {
 
+
         RouteRequestDTO request = new RouteRequestDTO();
         request.setOriginLat(originLat);
         request.setOriginLon(originLon);

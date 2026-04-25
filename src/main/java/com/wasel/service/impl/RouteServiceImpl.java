@@ -48,6 +48,7 @@ public class RouteServiceImpl implements RouteService {
                 request.getDestinationLon(), request.getDestinationLat()
         );
 
+
         if (apiResult != null) {
             distanceKm = apiResult[0] / 1000.0;
             durationMinutes = apiResult[1] / 60.0;
