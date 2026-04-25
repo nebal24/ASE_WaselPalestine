@@ -21,19 +21,14 @@ A more detailed explanation of the system scope, components, and responsibilitie
 [View System Overview](docs/system-overview.md)
 
 ---
-
 ## ✨ Core Features
 
 | Feature | Description |
-|--------|-------------|
-| 🚧 Road Incidents Management | Create, update, verify, and close incidents with filtering, sorting, and pagination |
-| 🚏 Checkpoints Registry | Centralized registry with checkpoint status history tracking |
-| 🗺️ Route Estimation | Calculate estimated distance and duration using OpenStreetMap (OSRM) |
-| 🌦️ Weather Integration | Real-time weather data by coordinates with caching support |
-| 🔐 JWT Authentication | Secure login with role-based authorization |
-| 📢 Alerts System | Users subscribe to notifications by area or category |
-| 👥 Crowdsourced Reports | Users submit reports with voting and moderation workflows |
-
+|---------|-------------|
+| 🚧 Road Incidents & Checkpoint Management | Provides a centralized system for managing road incidents, checkpoints, closures, delays, accidents, and hazardous conditions. Authorized users can create, update, verify, and close incidents, while users can view them with filtering, sorting, and pagination. |
+| 👥 Crowdsourced Reporting System | Allows citizens to submit mobility disruption reports with location, category, description, and timestamp. Reports go through validation, duplicate detection, moderation, and credibility scoring to improve reliability. |
+| 🗺️ Route Estimation & Mobility Intelligence | Estimates routes between two locations and returns the expected distance, duration, and metadata explaining factors that may affect the route, such as checkpoints, incidents, or avoided areas. |
+| 📢 Alerts & Regional Notifications | Enables users to subscribe to alerts based on geographic areas or incident categories. When new verified incidents are added, alert records are generated to support future notification services. |
 ---
 
 ## 🛠️ Tech Stack

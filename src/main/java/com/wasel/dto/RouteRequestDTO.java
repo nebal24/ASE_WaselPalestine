@@ -14,6 +14,7 @@ public class RouteRequestDTO {
     private Double originLat;
     private Double originLon;
 
+
     // Destination coordinates
     private Double destinationLat;
     private Double destinationLon;
